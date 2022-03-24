@@ -1,29 +1,17 @@
 #pragma once
 #include "defs.h"
 
-struct Renderer;
+class Renderer;
 struct EntityManager;
-struct EventManager;
+class EventManager;
+class Entity;
 
-void BlitSpriteSystem (
-	EntityManager* entMan, int id, Renderer* renderer, int layer);
-void AngleTickSystem (
-	EntityManager* entMan, int id);
-void SplashTickSystem (
-	EntityManager* entMan, int id, EventManager* eventManager);
-void MaskTickSystem (
-	EntityManager* entMan, int id, EventManager* eventManager);
-void FlappyPhysicsSystem (
-	EntityManager* entMan, int id);
-void FlappyInputSystem (
-	EntityManager* entMan, int id);
-void PipeSpawnerTickSystem (
-	EntityManager* entMan, int id, EventManager* eventManager);
-void PipeTickSystem (
-	EntityManager* entMan, int id, EventManager* eventManager);
-void PipeSpriteSystem (
-	EntityManager* entMan, int id, Renderer* renderer);
-void CollisionHandlerSystem(
-	EntityManager* entMan, int id, EventManager* eventManager);
-void HudSystem (
-	EntityManager* entMan, int id, Renderer* renderer);
+void BlitSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full = false, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
+void AngleTickSystem(Entity* entity);
+void FlappyPhysicsSystem(Entity* entity);
+void FlappyInputSystem(Entity* entity);
+void PipeSpawnerTickSystem(Entity* entity, EventManager* eventManager);
+void PipeTickSystem(Entity* entity);
+void PipeSpriteSystem(Entity* entity, Renderer* renderer);
+void CollisionHandlerSystem(EntityManager* entMan, Entity* entity, EventManager* eventManager);
+void HudSystem(Entity* entity, Renderer* renderer);

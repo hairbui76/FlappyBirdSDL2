@@ -2,12 +2,11 @@
 #include "defs.h"
 #include "event.h"
 
-struct Renderer;
-struct EventManager;
-struct SceneManager;
+class Renderer;
+class EventManager;
+class SceneManager;
 
-struct App : EventListener {
-  private:
+class App : public EventListener {
 	double GetDelta();
 	void PumpSystemEvents();
 
@@ -16,7 +15,7 @@ struct App : EventListener {
 	SceneManager* sceneManager;
 
 	bool running;
-	double lastTicks;
+	uint32_t startTime;
 	double tickRate;
 	double lag;
 

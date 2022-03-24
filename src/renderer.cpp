@@ -2,15 +2,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <iostream>
 
-static Texture* dunno;
 static Texture* tex_bckgnd;
 static Texture* tex_flap;
-static Texture* tex_mask;
 static Texture* tex_menu;
 static Texture* tex_pipe;
-static Texture* tex_splash;
-static Texture* tex_splash1;
 static Texture* tex_gnd;
 
 static TTF_Font* font;
@@ -21,7 +18,6 @@ static SDL_Color yellow;
 
 static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath);
 static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, int w, int h, int frames);
-static Texture* LoadPngTex(SDL_Renderer* renderer, char const* fPath);
 
 Texture::Texture(SDL_Texture* tex, int w, int h, int frames) {
 	this->tex = tex;
@@ -33,7 +29,7 @@ Texture::Texture(SDL_Texture* tex, int w, int h, int frames) {
 Renderer::Renderer() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_CreateWindowAndRenderer(WIN_X, WIN_Y, 0, &window, &renderer);
-	SDL_SetWindowResizable(window, SDL_FALSE);
+	SDL_SetWindowResizable(window, SDL_TRUE);
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	target = NULL;
 
@@ -56,14 +52,10 @@ Renderer::Renderer() {
 	yellow.g = 211;
 	yellow.a = 255;
 
-	dunno = LoadTex(renderer, "assets/dunno.bmp");
 	tex_bckgnd = LoadTex(renderer, "assets/background.bmp");
 	tex_flap = LoadTex(renderer, "assets/tex_flap.bmp");
-	tex_mask = LoadTex(renderer, "assets/tex_mask.bmp");
 	tex_menu = LoadTex(renderer, "assets/tex_menu.bmp");
 	tex_pipe = LoadTex(renderer, "assets/pipe.bmp");
-	tex_splash = LoadTex(renderer, "assets/tex_splash.bmp");
-	tex_splash1 = LoadTex(renderer, "assets/tex_splash1.bmp");
 	tex_gnd = LoadTex(renderer, "assets/tex_gnd.bmp", 45, 160, 2);
 }
 
@@ -74,40 +66,29 @@ Renderer::~Renderer() {
 	SDL_Quit();
 }
 
-void Renderer::Blit(
-	double x,
-	double y,
-	int w,
-	int h,
-	double angle,
-	Texture* tex,
-	double scale,
-	double alpha,
-	int frame,
-	int offset) {
-	SDL_Rect sQuad;
-	if (offset == -1) {
-		sQuad.x = w * frame;
-		sQuad.y = 0;
-		sQuad.w = w;
-		sQuad.h = h;
-	} else {
-		sQuad.x = frame;
-		sQuad.y = 0;
-		sQuad.w = w;
-		sQuad.h = h;
-	}
+void Renderer::Blit(double x, double y, int w, int h, double angle, Texture* tex, double scale, int frame, int offset, bool full, SDL_RendererFlip flip_flag) {
+	try {
+		SDL_Rect sQuad;
+		if (offset == -1) {
+			sQuad.x = w * frame;
+			sQuad.y = 0;
+			sQuad.w = w;
+			sQuad.h = h;
+		} else {
+			sQuad.x = frame;
+			sQuad.y = 0;
+			sQuad.w = w;
+			sQuad.h = h;
+		}
 
-	SDL_Rect dQuad = {(int)x, (int)y, (int)(w * scale), (int)(h * scale)};
-	SDL_SetTextureAlphaMod(tex->tex, alpha);
-	SDL_RenderCopyEx(
-		renderer,
-		tex->tex,
-		&sQuad,
-		&dQuad,
-		angle,
-		NULL,
-		SDL_FLIP_NONE);
+		SDL_Rect dQuad = {(int)x, (int)y, (int)(w * scale), (int)(h * scale)};
+		if (full)
+			SDL_RenderCopyEx(renderer, tex->tex, &sQuad, NULL, angle, NULL, flip_flag);
+		else
+			SDL_RenderCopyEx(renderer, tex->tex, &sQuad, &dQuad, angle, NULL, flip_flag);
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
 }
 
 void Renderer::Print(int x, int y, char const* text) {
@@ -115,14 +96,7 @@ void Renderer::Print(int x, int y, char const* text) {
 	TTF_SizeText(font, text, &r.w, &r.h);
 	SDL_Surface* surf = TTF_RenderText_Solid(font, text, red);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
-	SDL_RenderCopyEx(
-		renderer,
-		tex,
-		NULL,
-		&r,
-		0.0,
-		NULL,
-		SDL_FLIP_NONE);
+	SDL_RenderCopyEx(renderer, tex, NULL, &r, 0.0, NULL, SDL_FLIP_NONE);
 	SDL_FreeSurface(surf);
 	SDL_DestroyTexture(tex);
 }
@@ -134,31 +108,20 @@ void Renderer::DrawLine(int aX, int aY, int bX, int bY) {
 void Renderer::Clear() {
 	if (target)
 		SDL_DestroyTexture(target);
-
+	// Create a blank texture for render everything onto it
+	// Use SDL_TEXTUREACCESS_TARGET to use texture as the target of rendering everything
 	target = SDL_CreateTexture(
 		renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIN_X, WIN_Y);
-
+	// Set render target to the blank texture
 	SDL_SetRenderTarget(renderer, target);
+	// Clear the render target (means clear the texture)
 	SDL_RenderClear(renderer);
 }
 
 void Renderer::Present() {
 	SDL_SetRenderTarget(renderer, NULL);
-
-	/*
-	SDL_RenderCopyEx(
-		renderer,
-		target,
-		NULL,
-		NULL,
-		0.0,
-		NULL,
-		SDL_FLIP_NONE
-	);
-	*/
-
 	double scale = 1;
-	SDL_Rect dQuad = {0, 0, 960 * scale, 1280 * scale};
+	SDL_Rect dQuad = {0, 0, (int)(540 * scale), (int)(765 * scale)};
 	SDL_RenderCopyEx(
 		renderer,
 		target,
@@ -173,17 +136,11 @@ void Renderer::Present() {
 
 Texture* Renderer::GetTexture(texture_e tag) {
 	switch (tag) {
-		case DUNNO:
-			return dunno;
-
 		case TEX_BCKGND:
 			return tex_bckgnd;
 
 		case TEX_FLAP:
 			return tex_flap;
-
-		case TEX_MASK:
-			return tex_mask;
 
 		case TEX_MENU:
 			return tex_menu;
@@ -191,17 +148,11 @@ Texture* Renderer::GetTexture(texture_e tag) {
 		case TEX_PIPE:
 			return tex_pipe;
 
-		case TEX_SPLASH:
-			return tex_splash;
-
-		case TEX_SPLASH1:
-			return tex_splash1;
-
 		case TEX_GND:
 			return tex_gnd;
 
 		default:
-			return dunno;
+			return NULL;
 	}
 }
 

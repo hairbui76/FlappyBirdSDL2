@@ -1,27 +1,24 @@
 #pragma once
-#include <cstddef>
-#include <cstdio>
+#include <SDL.h>
 #include <cstring>
+#include <queue>
+#include <random>
+#include <time.h>
 #include <vector>
 
-#define WIN_X 960
-#define WIN_Y 1280
+#define WIN_X 540
+#define WIN_Y 765
 #define TICK_RATE 60.0
-#define MAX_ENTS 32
-#define MAX_EVENTS 16
 #define PIPE_GAP 312.0
 #define MAX_LAYER 3
 
-void InitRandom();
-int GetRandom(int a, int b);
+int getRandom(int a, int b);
 void logSDLError();
 
 enum component_tag_e {
-
 	POSITION,
 	SPRITE,
 	ANGLE,
-	SPLASH_TICK,
 	SIZE,
 	MASK_TICK,
 	FLAPPY_PHYSICS,
@@ -34,26 +31,17 @@ enum component_tag_e {
 	COLLIDABLE,
 	SCORE,
 	SCORELISTENER
-
 };
 
 enum texture_e {
-
-	DUNNO,
 	TEX_BCKGND,
 	TEX_FLAP,
-	TEX_MASK,
 	TEX_MENU,
 	TEX_PIPE,
-	TEX_SPLASH,
-	TEX_SPLASH1,
 	TEX_GND
-
 };
 
 enum scene_e {
-
 	TITLE,
 	GAME
-
 };

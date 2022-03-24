@@ -2,9 +2,6 @@
 #include "defs.h"
 #include "event.h"
 
-struct Texture;
-struct Event;
-
 struct Component {
 	component_tag_e tag;
 };
@@ -17,17 +14,11 @@ struct PositionComponent : Component {
 };
 
 struct SpriteComponent : Component {
-	SpriteComponent(texture_e tName, double scale, double alpha, int layer);
+	SpriteComponent(texture_e tName, double scale, int layer);
 
 	texture_e tName;
 	double scale;
-	double alpha;
 	int layer;
-};
-
-struct ListenerComponent : Component, EventListener {
-	ListenerComponent();
-	void Responder(Event* event);
 };
 
 struct RotateComponent : Component {
@@ -37,26 +28,11 @@ struct RotateComponent : Component {
 	double angleAcc;
 };
 
-struct SplashTickComponent : Component {
-	SplashTickComponent(double scaleAcc, double rotAcc);
-
-	double scaleAcc;
-	double rotAcc;
-	bool ended;
-};
-
 struct SizeComponent : Component {
 	SizeComponent(double w, double h);
 
 	double w;
 	double h;
-};
-
-struct MaskTickComponent : Component {
-	MaskTickComponent(double decay);
-
-	double decay;
-	double value;
 };
 
 struct FlappyPhysicsComponent : Component {
@@ -75,11 +51,13 @@ struct FlappyInputComponent : Component {
 
 struct SpriteSpanComponent : Component {
 	SpriteSpanComponent(int repeat);
+
 	int repeat;
 };
 
 struct AnimComponent : Component {
 	AnimComponent(int fCount, double decay, int w, int h, int offset);
+
 	int fCount;
 	int currFrame;
 	double value;
@@ -116,12 +94,18 @@ struct CollidableComponent : Component {
 
 struct ScoreComponent : Component {
 	ScoreComponent(int maxScore);
+
 	int score;
 	int maxScore;
 };
-
 struct ScoreListenerComponent : Component, EventListener {
 	ScoreListenerComponent(ScoreComponent* scr);
 	void Responder(Event* event);
+
 	ScoreComponent* scr;
+};
+
+struct ListenerComponent : Component, EventListener {
+	ListenerComponent();
+	void Responder(Event* event);
 };

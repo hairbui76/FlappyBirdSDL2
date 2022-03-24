@@ -1,51 +1,41 @@
 #pragma once
 #include "defs.h"
 
-enum eventType_e {
-
+enum event_type_e {
 	QUIT,
 	NONE,
 	CHANGE_SCENE,
 	KEYDOWN,
-	TITLE_SPLASH_DONE,
 	SPAWN_PIPE,
 	KILL_ENT,
 	GAME_RESTART,
 	INC_SCORE,
 	MOUSE_BUTT
-
 };
 
 struct Event {
+	Event(event_type_e type, const char* data);
 
-	Event(eventType_e type, const char* data);
-
-	eventType_e type;
+	event_type_e type;
 	const char* data;
-
 };
 
 struct EventListener {
-
-	virtual void Responder(Event* event)=0;
-
+	virtual void Responder(Event* event) = 0;
+	EventListener() = default;
+	virtual ~EventListener() = default;
 };
 
-struct EventManager {
+class EventManager {
+	std::vector<EventListener*> listeners;
+	std::queue<Event*> eventQueue;
 
+  public:
 	EventManager();
-	~EventManager();
+	~EventManager() = default;
 
 	void PumpEvents();
 	void AddListener(EventListener* listener);
 	void RemoveListener(EventListener* listener);
 	void Post(Event* event);
-
-	private:
-	std::vector<EventListener*> listenerVect;
-	std::vector<Event*> queue;
-	Event* eventQueue[MAX_EVENTS];
-	int head;
-	int tail;
-
 };

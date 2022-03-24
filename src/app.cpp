@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "scene.h"
 #include <SDL2/SDL.h>
+#include <iostream>
 
 App::App() {
 	renderer = new Renderer;
@@ -13,11 +14,9 @@ App::App() {
 
 	running = true;
 
-	lastTicks = 0.0;
+	startTime = SDL_GetTicks();
 	tickRate = 1.0 / TICK_RATE;
 	lag = 0.0;
-
-	InitRandom();
 }
 
 App::~App() {
@@ -35,6 +34,7 @@ void App::Run() {
 			sceneManager->Tick();
 		}
 
+		// Clear renderer
 		renderer->Clear();
 		sceneManager->DoFrame();
 		renderer->Present();
@@ -42,9 +42,9 @@ void App::Run() {
 }
 
 double App::GetDelta() {
-	double ticks = SDL_GetTicks();
-	double delta = ticks - lastTicks;
-	lastTicks = ticks;
+	uint32_t currTime = SDL_GetTicks();
+	uint32_t delta = currTime - startTime;
+	startTime = currTime;
 
 	return delta / 1000.0;
 }

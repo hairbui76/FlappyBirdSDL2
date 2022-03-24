@@ -1,49 +1,34 @@
 #pragma once
 #include "defs.h"
 
-/*******
-	Creating a component:
-		- create struct in component.cpp
-		- create new tag in enum in defs.h
-		- ensure struct uses inherited tag member
-		- create array in entitymanager for component
-		- ensure array is NULLed in constructor
-		- update AddComponent and RemoveComponent
-
-*******/
-
 struct Component;
 struct ComponentContainer;
 struct PositionComponent;
 struct SpriteComponent;
 
-struct EntityManager {
+struct Entity {
+	Component* position;
+	Component* sprite;
+	Component* angle;
+	Component* size;
+	Component* flappyPhysics;
+	Component* flappyInput;
+	Component* spriteSpan;
+	Component* anim;
+	Component* pipeSpawn;
+	Component* pipe;
+	Component* pipeSprite;
+	Component* collidable;
+	Component* score;
+	Component* scoreListener;
 
-	EntityManager();
+	Entity() = default;
+	~Entity();
+};
+
+struct EntityManager {
+	EntityManager() = default;
 	~EntityManager();
 
-	int  NewEntity();
-	void KillEntity(int id);
-	void AddComponent(int id, Component* component);
-	void RemoveComponent(int id, component_tag_e tag);
-
-	bool       activeEnts[MAX_ENTS];
-
-	Component* position      [MAX_ENTS];
-	Component* sprite        [MAX_ENTS];
-	Component* angle         [MAX_ENTS];
-	Component* splashTick    [MAX_ENTS];
-	Component* size          [MAX_ENTS];
-	Component* maskTick      [MAX_ENTS];
-	Component* flappyPhysics [MAX_ENTS];
-	Component* flappyInput   [MAX_ENTS];
-	Component* spriteSpan    [MAX_ENTS];
-	Component* anim          [MAX_ENTS];
-	Component* pipeSpawn     [MAX_ENTS];
-	Component* pipe          [MAX_ENTS];
-	Component* pipeSprite    [MAX_ENTS];
-	Component* collidable    [MAX_ENTS];
-	Component* score         [MAX_ENTS];
-	Component* scoreListener [MAX_ENTS];
-
+	std::vector<Entity*> entities;
 };
