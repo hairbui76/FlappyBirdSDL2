@@ -41,6 +41,35 @@ void App::PumpSystemEvents() {
 			case SDL_QUIT:
 				eventManager->Post(new Event(QUIT, ""));
 				break;
+
+			case SDL_KEYDOWN:
+				if (event.key.repeat == 1)
+					break;
+
+				switch (event.key.keysym.sym) {
+					case SDLK_RIGHT:
+						eventManager->Post(new Event(KEYDOWN, "RIGHT"));
+						break;
+
+					case SDLK_LEFT:
+						eventManager->Post(new Event(KEYDOWN, "LEFT"));
+						break;
+
+					case SDLK_SPACE:
+						eventManager->Post(new Event(KEYDOWN, "SPACE"));
+						break;
+
+					default:
+						break;
+				}
+				break;
+
+			case SDL_MOUSEBUTTONDOWN:
+				eventManager->Post(new Event(MOUSE_BUTT, " "));
+				break;
+
+			default:
+				break;
 		}
 	}
 }

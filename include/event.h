@@ -3,10 +3,8 @@
 
 enum event_type_e {
 	QUIT,
-	NONE,
 	CHANGE_SCENE,
 	KEYDOWN,
-	SPAWN_PIPE,
 	KILL_ENT,
 	GAME_RESTART,
 	INC_SCORE,
@@ -31,7 +29,7 @@ class EventManager {
 	std::vector<EventListener*> listeners;
 	std::queue<Event*> eventQueue;
 
-  public:
+public:
 	EventManager();
 	~EventManager() = default;
 

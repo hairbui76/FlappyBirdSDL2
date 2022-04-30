@@ -51,7 +51,7 @@ Renderer::Renderer() {
 	SDL_RenderSetLogicalSize(renderer, WIN_X, WIN_Y);
 	target = nullptr;
 
-	font = TTF_OpenFont("assets/charter-sc-itc-tt.ttf", 60);
+	font = TTF_OpenFont("assets/charter-sc-itc-tt.ttf", 80);
 	if (font == nullptr) logSDLError("Unable to load font: %s", TTF_GetError());
 	red.r = 155;
 	red.g = 50;

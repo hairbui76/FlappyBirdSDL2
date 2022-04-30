@@ -75,9 +75,6 @@ void TitleScene::Tick() {
 }
 
 void TitleScene::Responder(Event*& event, EventManager*& eventManager) {
-	if (event->type == KEYDOWN && !strcmp(event->data, " "))
-		eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
-
-	if (event->type == MOUSE_BUTT)
+	if (event->type == MOUSE_BUTT && !strcmp(event->data, " "))
 		eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
 }

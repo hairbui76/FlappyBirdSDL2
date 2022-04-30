@@ -16,6 +16,7 @@ enum component_tag_e {
 	POSITION,
 	SIZE,
 	ANGLE,
+	CLICKABLE,
 };
 
 enum texture_e {

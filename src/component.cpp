@@ -40,3 +40,9 @@ void ScoreListenerComponent::Responder(Event* event) {
 		this->scr->score += 1;
 	}
 }
+
+ClickableComponent::ClickableComponent(int layer) {
+	this->tag = CLICKABLE;
+	this->isClicked = false;
+	this->layer = layer;
+}

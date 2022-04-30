@@ -41,6 +41,7 @@ struct ScoreComponent : Component {
 	int score;
 	int maxScore;
 };
+
 struct ScoreListenerComponent : Component, EventListener {
 	ScoreListenerComponent(ScoreComponent* scr);
 	void Responder(Event* event);
@@ -48,7 +49,9 @@ struct ScoreListenerComponent : Component, EventListener {
 	ScoreComponent* scr;
 };
 
-struct ListenerComponent : Component, EventListener {
-	ListenerComponent();
-	void Responder(Event* event);
+struct ClickableComponent : Component {
+	ClickableComponent(int layer);
+
+	bool isClicked;
+	int layer;
 };

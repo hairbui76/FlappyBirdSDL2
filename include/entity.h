@@ -4,12 +4,13 @@
 struct Component;
 
 struct Entity {
-	Component* position;
-	Component* sprite;
-	Component* angle;
-	Component* size;
-	Component* score;
-	Component* scoreListener;
+	Component* position = nullptr;
+	Component* sprite = nullptr;
+	Component* angle = nullptr;
+	Component* size = nullptr;
+	Component* score = nullptr;
+	Component* scoreListener = nullptr;
+	Component* clickable = nullptr;
 
 	Entity() = default;
 	~Entity();
