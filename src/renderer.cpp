@@ -105,10 +105,24 @@ Renderer::Renderer() {
 }
 
 Renderer::~Renderer() {
+	SDL_DestroyTexture(tex_bg->tex);
+	SDL_DestroyTexture(tex_branch->tex);
+	SDL_DestroyTexture(tex_log->tex);
+	SDL_DestroyTexture(tex_stone->tex);
+	SDL_DestroyTexture(tex_trunk->tex);
+	SDL_DestroyTexture(tex_play->tex);
+	SDL_DestroyTexture(tex_refresh->tex);
+	SDL_DestroyTexture(tex_left->tex);
+	SDL_DestroyTexture(tex_right->tex);
+	SDL_DestroyTexture(tex_lumber_body->tex);
+	SDL_DestroyTexture(tex_hand_down->tex);
+	SDL_DestroyTexture(tex_hand_up->tex);
+	SDL_DestroyTexture(tex_lumber_dead->tex);
+	SDL_DestroyTexture(tex_text_title->tex);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 	TTF_CloseFont(font);
 	TTF_Quit();
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 }
 
