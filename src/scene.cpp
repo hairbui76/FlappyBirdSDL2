@@ -4,7 +4,7 @@
 #include "titlescene.h"
 #include <iostream>
 
-SceneManager::SceneManager(Renderer* renderer, EventManager* eventManager) {
+SceneManager::SceneManager(Renderer*& renderer, EventManager*& eventManager) {
 	this->renderer = renderer;
 	this->eventManager = eventManager;
 
@@ -35,7 +35,6 @@ void SceneManager::Responder(Event* event) {
 
 		case CHANGE_SCENE: {
 			if (!strcmp(event->data, "GAME_SCENE")) {
-				std::cout << "hi" << std::endl;
 				ChangeScene(GAME);
 			}
 			break;
@@ -54,7 +53,9 @@ void SceneManager::ChangeScene(scene_e sceneTag) {
 			sceneStack.push_back(new TitleScene(eventManager));
 			break;
 		case GAME:
-			sceneStack.push_back(new GameScene(renderer, eventManager));
+			sceneStack.push_back(new GameScene(eventManager));
+			break;
+		default:
 			break;
 	};
 }

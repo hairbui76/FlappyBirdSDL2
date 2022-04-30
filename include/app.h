@@ -7,7 +7,6 @@ class EventManager;
 class SceneManager;
 
 class App : public EventListener {
-	double GetDelta();
 	void PumpSystemEvents();
 
 	Renderer* renderer;
@@ -15,11 +14,8 @@ class App : public EventListener {
 	SceneManager* sceneManager;
 
 	bool running;
-	uint32_t startTime;
-	double tickRate;
-	double lag;
 
-  public:
+public:
 	App();
 	~App();
 

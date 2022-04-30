@@ -14,10 +14,10 @@ EventManager::EventManager() {
 void EventManager::PumpEvents() {
 	while (!eventQueue.empty()) {
 		Event* event = eventQueue.front();
-		for (size_t j = 0; j < listeners.size(); ++j) {
-			listeners[j]->Responder(event);
-		}
 		eventQueue.pop();
+		for (auto listener : listeners)
+			listener->Responder(event);
+		delete (event);
 	}
 }
 

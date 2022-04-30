@@ -6,7 +6,7 @@ struct TitleScene : Scene {
 	TitleScene(EventManager* eventManager);
 	~TitleScene();
 
-	void DoFrame(Renderer* renderer);
+	void DoFrame(Renderer*& renderer);
 	void Tick();
-	void Responder(Event* event, EventManager* eventManager);
+	void Responder(Event*& event, EventManager*& eventManager);
 };

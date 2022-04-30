@@ -8,30 +8,73 @@
 TitleScene::TitleScene(EventManager* eventManager) {
 	entMan = new EntityManager;
 	this->eventManager = eventManager;
+
 	// background
-	Entity* entity = new Entity;
-	entity->position = new PositionComponent(0.0, 0.0);
-	entity->sprite = new SpriteComponent(TEX_BCKGND, 1.0, 0);
-	entMan->entities.push_back(entity);
+	Entity* ent1 = new Entity;
+	ent1->position = new PositionComponent(0.0, 0.0);
+	ent1->sprite = new SpriteComponent(TEX_BG, 1.0, 0);
+	ent1->size = new SizeComponent(WIN_X, WIN_Y - 200);
+	entMan->entities.push_back(ent1);
+
+	// the log
+	Entity* ent2 = new Entity;
+	ent2->position = new PositionComponent((WIN_X - 50) / 2, WIN_Y - 307);
+	ent2->sprite = new SpriteComponent(TEX_LOG, 1.0, 0);
+	ent2->size = new SizeComponent(50, 50);
+	entMan->entities.push_back(ent2);
+
+	// the stone
+	Entity* ent3 = new Entity;
+	ent3->position = new PositionComponent((WIN_X - 75) / 2, WIN_Y - 275);
+	ent3->sprite = new SpriteComponent(TEX_STONE, 1.0, 0);
+	ent3->size = new SizeComponent(75, 36);
+	entMan->entities.push_back(ent3);
+
+	// lumberjack body
+	Entity* ent4 = new Entity;
+	ent4->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
+	ent4->sprite = new SpriteComponent(TEX_LUMBER_BODY, 1.0, 0);
+	ent4->size = new SizeComponent(50, 107);
+	entMan->entities.push_back(ent4);
+
+	// lumberjack hand up
+	Entity* ent5 = new Entity;
+	ent5->position = new PositionComponent(WIN_X / 2 + 60, WIN_Y - 365);
+	ent5->sprite = new SpriteComponent(TEX_HAND_UP, 1.0, 0);
+	ent5->size = new SizeComponent(47, 52);
+	entMan->entities.push_back(ent5);
+
+	// play button
+	Entity* ent6 = new Entity;
+	ent6->position = new PositionComponent((WIN_X - 120) / 2, WIN_Y - 160);
+	ent6->sprite = new SpriteComponent(TEX_PLAY, 1.0, 0);
+	ent6->size = new SizeComponent(120, 120);
+	entMan->entities.push_back(ent6);
+
+	// title game
+	Entity* ent7 = new Entity;
+	ent7->position = new PositionComponent((WIN_X - Renderer::GetTexture(TEX_TEXT_TITLE)->w) / 2, WIN_Y / 3);
+	ent7->sprite = new SpriteComponent(TEX_TEXT_TITLE, 1.0, 0);
+	entMan->entities.push_back(ent7);
 }
 
 TitleScene::~TitleScene() {
 	delete (entMan);
 }
 
-void TitleScene::DoFrame(Renderer* renderer) {
+void TitleScene::DoFrame(Renderer*& renderer) {
 	for (auto entity : entMan->entities) {
-		BlitSpriteSystem(entity, renderer, 0, true);
+		renderSpriteSystem(entity, renderer, 0);
 	}
 }
 
 void TitleScene::Tick() {
-	for (auto entity : entMan->entities) {
-		AngleTickSystem(entity);
-	}
+	// for (auto entity : entMan->entities) {
+	// AngleTickSystem(entity);
+	// }
 }
 
-void TitleScene::Responder(Event* event, EventManager* eventManager) {
+void TitleScene::Responder(Event*& event, EventManager*& eventManager) {
 	if (event->type == KEYDOWN && !strcmp(event->data, " "))
 		eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
 

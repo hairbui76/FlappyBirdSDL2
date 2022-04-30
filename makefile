@@ -98,4 +98,4 @@ run: all
 	./$(MAIN)
 	@echo Executing 'run: all' complete!
 
-re: clean all run
+re: clean run

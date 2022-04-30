@@ -6,42 +6,40 @@
 #include <time.h>
 #include <vector>
 
-#define WIN_X 540
-#define WIN_Y 765
-#define TICK_RATE 60.0
-#define PIPE_GAP 312.0
-#define MAX_LAYER 3
-
-int getRandom(int a, int b);
-void logSDLError();
+#define WIN_X 600
+#define WIN_Y 757
 
 enum component_tag_e {
-	POSITION,
 	SPRITE,
-	ANGLE,
-	SIZE,
-	MASK_TICK,
-	FLAPPY_PHYSICS,
-	FLAPPY_INPUT,
-	SPRITE_SPAN,
-	ANIM,
-	PIPE_SPAWN,
-	PIPE,
-	PIPE_SPRITE,
-	COLLIDABLE,
 	SCORE,
-	SCORELISTENER
+	SCORELISTENER,
+	POSITION,
+	SIZE,
+	ANGLE,
 };
 
 enum texture_e {
-	TEX_BCKGND,
-	TEX_FLAP,
-	TEX_MENU,
-	TEX_PIPE,
-	TEX_GND
+	TEX_BG,
+	TEX_BRANCH,
+	TEX_LOG,
+	TEX_STONE,
+	TEX_TRUNK,
+	TEX_PLAY,
+	TEX_REFRESH,
+	TEX_LEFT,
+	TEX_RIGHT,
+	TEX_LUMBER_DEAD,
+	TEX_LUMBER_BODY,
+	TEX_HAND_DOWN,
+	TEX_HAND_UP,
+	TEX_TEXT_TITLE
 };
 
 enum scene_e {
 	TITLE,
 	GAME
 };
+
+int getRandom(int a, int b);
+void logSDLError(const char* msg, const char* err, ...);
+std::string getTextureTag(texture_e tag);

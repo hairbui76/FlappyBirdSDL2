@@ -4,6 +4,7 @@
 
 struct Component {
 	component_tag_e tag;
+	~Component() = default;
 };
 
 struct PositionComponent : Component {
@@ -22,10 +23,9 @@ struct SpriteComponent : Component {
 };
 
 struct RotateComponent : Component {
-	RotateComponent(double angle, double angleAcc);
+	RotateComponent(double angle);
 
 	double angle;
-	double angleAcc;
 };
 
 struct SizeComponent : Component {
@@ -33,63 +33,6 @@ struct SizeComponent : Component {
 
 	double w;
 	double h;
-};
-
-struct FlappyPhysicsComponent : Component {
-	FlappyPhysicsComponent();
-
-	double grav;
-	double yAcc;
-};
-
-struct FlappyInputComponent : Component {
-	FlappyInputComponent(EventManager* eventManager);
-
-	EventManager* eventManager;
-	double lift;
-};
-
-struct SpriteSpanComponent : Component {
-	SpriteSpanComponent(int repeat);
-
-	int repeat;
-};
-
-struct AnimComponent : Component {
-	AnimComponent(int fCount, double decay, int w, int h, int offset);
-
-	int fCount;
-	int currFrame;
-	double value;
-	double decay;
-	int w;
-	int h;
-	int offset;
-};
-
-struct PipeSpawnerComponent : Component {
-	PipeSpawnerComponent(double decay);
-
-	double value;
-	double decay;
-};
-
-struct PipeComponent : Component {
-	PipeComponent(double offset, double xAcc);
-
-	double offset;
-	double xAcc;
-	bool hasScore;
-};
-
-struct PipeSpriteComponent : Component {
-	PipeSpriteComponent(texture_e tName);
-
-	texture_e tName;
-};
-
-struct CollidableComponent : Component {
-	CollidableComponent();
 };
 
 struct ScoreComponent : Component {

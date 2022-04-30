@@ -15,6 +15,7 @@ enum event_type_e {
 
 struct Event {
 	Event(event_type_e type, const char* data);
+	~Event() = default;
 
 	event_type_e type;
 	const char* data;

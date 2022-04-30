@@ -13,66 +13,9 @@ SpriteComponent::SpriteComponent(texture_e tName, double scale, int layer) {
 	this->layer = layer;
 }
 
-RotateComponent::RotateComponent(double angle, double angleAcc) {
+RotateComponent::RotateComponent(double angle) {
 	this->tag = ANGLE;
 	this->angle = angle;
-	this->angleAcc = angleAcc;
-}
-
-SizeComponent::SizeComponent(double w, double h) {
-	this->tag = SIZE;
-	this->w = w;
-	this->h = h;
-}
-
-FlappyPhysicsComponent::FlappyPhysicsComponent() {
-	this->tag = FLAPPY_PHYSICS;
-	this->grav = 1.2;
-	this->yAcc = 0.0;
-}
-
-FlappyInputComponent::FlappyInputComponent(EventManager* eventManager) {
-	this->tag = FLAPPY_INPUT;
-	this->eventManager = eventManager;
-	this->lift = -40.0;
-}
-
-SpriteSpanComponent::SpriteSpanComponent(int repeat) {
-	this->tag = SPRITE_SPAN;
-	this->repeat = repeat;
-}
-
-AnimComponent::AnimComponent(int fCount, double decay, int w, int h, int offset) {
-	this->tag = ANIM;
-	this->fCount = fCount;
-	this->currFrame = 0;
-	this->value = 1.0;
-	this->decay = decay;
-	this->w = w;
-	this->h = h;
-	this->offset = offset;
-}
-
-PipeSpawnerComponent::PipeSpawnerComponent(double decay) {
-	this->tag = PIPE_SPAWN;
-	this->value = 1.0;
-	this->decay = decay;
-}
-
-PipeComponent::PipeComponent(double offset, double xAcc) {
-	this->tag = PIPE;
-	this->offset = offset;
-	this->xAcc = xAcc;
-	this->hasScore = true;
-}
-
-PipeSpriteComponent::PipeSpriteComponent(texture_e tName) {
-	this->tag = PIPE_SPRITE;
-	this->tName = tName;
-}
-
-CollidableComponent::CollidableComponent() {
-	this->tag = COLLIDABLE;
 }
 
 ScoreComponent::ScoreComponent(int maxScore) {
@@ -84,6 +27,12 @@ ScoreComponent::ScoreComponent(int maxScore) {
 ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr) {
 	this->tag = SCORELISTENER;
 	this->scr = scr;
+}
+
+SizeComponent::SizeComponent(double w, double h) {
+	this->tag = SIZE;
+	this->w = w;
+	this->h = h;
 }
 
 void ScoreListenerComponent::Responder(Event* event) {
