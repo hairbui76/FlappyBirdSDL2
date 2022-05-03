@@ -12,7 +12,6 @@ struct Scene {
 
 	EntityManager* entMan;
 	EventManager* eventManager;
-	Renderer* renderer;
 };
 
 class SceneManager : public EventListener {
@@ -21,7 +20,7 @@ class SceneManager : public EventListener {
 	Renderer* renderer;
 	EventManager* eventManager;
 
-  public:
+public:
 	SceneManager(Renderer* renderer, EventManager* eventManager);
 	virtual ~SceneManager() = default;
 

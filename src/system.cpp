@@ -7,60 +7,56 @@
 #include <iostream>
 
 void BlitSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full, SDL_RendererFlip flip_flag) {
-	try {
-		if (entity->position && entity->sprite) {
-			PositionComponent* pos = (PositionComponent*)entity->position;
-			SpriteComponent* spr = (SpriteComponent*)entity->sprite;
-			Texture* tex = renderer->GetTexture(spr->tName);
+	if (entity->position && entity->sprite) {
+		PositionComponent* pos = (PositionComponent*)entity->position;
+		SpriteComponent* spr = (SpriteComponent*)entity->sprite;
+		Texture* tex = renderer->GetTexture(spr->tName);
 
-			if (spr->layer != layer) {
-				// std::cout << spr->layer << std::endl;
-				return;
-			}
-
-			double x = pos->x;
-			double y = pos->y;
-			int w = tex->w;
-			int h = tex->h;
-			double scale = spr->scale;
-			double angle = 0.0;
-			int repeat = 1;
-			int frame = 0;
-			int offset = -1;
-
-			if (entity->angle) {
-				RotateComponent* r = (RotateComponent*)entity->angle;
-				angle = r->angle;
-			}
-
-			if (entity->spriteSpan) {
-				SpriteSpanComponent* spn = (SpriteSpanComponent*)entity->spriteSpan;
-
-				repeat = spn->repeat;
-			}
-
-			if (entity->anim) {
-				AnimComponent* anm = (AnimComponent*)entity->anim;
-				w = anm->w;
-				h = anm->h;
-
-				anm->value += anm->decay;
-				if (anm->value <= 0.0) {
-					anm->value = 1.0;
-					anm->currFrame = (anm->currFrame + 1) % anm->fCount;
-				}
-
-				frame = anm->currFrame;
-				if (anm->offset != -1)
-					offset = anm->offset;
-			}
-
-			for (int j = 0; j < repeat; ++j) {
-				renderer->Blit(x + (j * w), y, w, h, angle, tex, scale, frame, offset, full, flip_flag);
-			}
+		if (spr->layer != layer) {
+			// std::cout << spr->layer << std::endl;
+			return;
 		}
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+
+		double x = pos->x;
+		double y = pos->y;
+		int w = tex->w;
+		int h = tex->h;
+		double scale = spr->scale;
+		double angle = 0.0;
+		int repeat = 1;
+		int frame = 0;
+		int offset = -1;
+
+		if (entity->angle) {
+			RotateComponent* r = (RotateComponent*)entity->angle;
+			angle = r->angle;
+		}
+
+		if (entity->spriteSpan) {
+			SpriteSpanComponent* spn = (SpriteSpanComponent*)entity->spriteSpan;
+
+			repeat = spn->repeat;
+		}
+
+		if (entity->anim) {
+			AnimComponent* anm = (AnimComponent*)entity->anim;
+			w = anm->w;
+			h = anm->h;
+
+			anm->value += anm->decay;
+			if (anm->value <= 0.0) {
+				anm->value = 1.0;
+				anm->currFrame = (anm->currFrame + 1) % anm->fCount;
+			}
+
+			frame = anm->currFrame;
+			if (anm->offset != -1)
+				offset = anm->offset;
+		}
+
+		for (int j = 0; j < repeat; ++j) {
+			renderer->Blit(x + (j * w), y, w, h, angle, tex, scale, frame, offset, full, flip_flag);
+		}
 	}
 }
 
@@ -128,24 +124,22 @@ void PipeTickSystem(Entity* entity) {
 }
 
 void PipeSpriteSystem(Entity* entity, Renderer* renderer) {
-	try {
-		if (entity->pipeSprite) {
-			PositionComponent* pos = (PositionComponent*)entity->position;
-			PipeSpriteComponent* psp = (PipeSpriteComponent*)entity->pipeSprite;
-			Texture* tex = renderer->GetTexture(psp->tName);
-			// pipe top
-			renderer->Blit(pos->x, pos->y - 800, tex->w, tex->h, 180.0, tex, 1.0, 0, -1, false, SDL_FLIP_HORIZONTAL);
-			// pipe bottom
-			renderer->Blit(pos->x, pos->y + PIPE_GAP, tex->w, tex->h, 0.0, tex, 1.0, 0, -1);
-		}
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+	if (entity->pipeSprite && entity->position) {
+		PositionComponent* pos = (PositionComponent*)entity->position;
+		PipeSpriteComponent* psp = (PipeSpriteComponent*)entity->pipeSprite;
+		Texture* tex;
+		if (psp->tName) tex = Renderer::GetTexture(psp->tName);
+		if (!tex) return;
+		// pipe top
+		renderer->Blit(pos->x, pos->y - 800, tex->w, tex->h, 180.0, tex, 1.0, 0, -1, false, SDL_FLIP_HORIZONTAL);
+		// pipe bottom
+		renderer->Blit(pos->x, pos->y + PIPE_GAP, tex->w, tex->h, 0.0, tex, 1.0, 0, -1);
 	}
 }
 
 void CollisionHandlerSystem(EntityManager* entMan, Entity* entity, EventManager* eventManager) {
 	// find flappy
-	if (entity->flappyPhysics) {
+	if (entity->flappyPhysics && entity->position && entity->size) {
 		PositionComponent* aPos = (PositionComponent*)entity->position;
 		SizeComponent* aSize = (SizeComponent*)entity->size;
 
@@ -212,12 +206,14 @@ void CollisionHandlerSystem(EntityManager* entMan, Entity* entity, EventManager*
 				}
 
 				// check for score trigger collision
-				if ((aPos->x + aSize->w) > bPos->x + ((160.0 / 3.0) * 2)) {
-					PipeComponent* pip = (PipeComponent*)entity->pipe;
+				if (entity->pipe) {
+					if ((aPos->x + aSize->w) > bPos->x + ((160.0 / 3.0) * 2)) {
+						PipeComponent* pip = (PipeComponent*)entity->pipe;
 
-					if (pip->hasScore) {
-						pip->hasScore = false;
-						eventManager->Post(new Event(INC_SCORE, " "));
+						if (pip->hasScore) {
+							pip->hasScore = false;
+							eventManager->Post(new Event(INC_SCORE, " "));
+						}
 					}
 				}
 
@@ -235,16 +231,12 @@ void CollisionHandlerSystem(EntityManager* entMan, Entity* entity, EventManager*
 }
 
 void HudSystem(Entity* entity, Renderer* renderer) {
-	try {
-		if (entity->score) {
-			PositionComponent* pos = (PositionComponent*)entity->position;
-			ScoreComponent* scr = (ScoreComponent*)entity->score;
+	if (entity->score) {
+		PositionComponent* pos = (PositionComponent*)entity->position;
+		ScoreComponent* scr = (ScoreComponent*)entity->score;
 
-			char buff[10];
-			sprintf(buff, "%d / %d", scr->score, scr->maxScore);
-			renderer->Print(pos->x, pos->y, buff);
-		}
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+		char buff[10];
+		sprintf(buff, "%d / %d", scr->score, scr->maxScore);
+		renderer->Print(pos->x, pos->y, buff);
 	}
 }

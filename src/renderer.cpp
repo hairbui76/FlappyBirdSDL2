@@ -152,7 +152,7 @@ Texture* Renderer::GetTexture(texture_e tag) {
 			return tex_gnd;
 
 		default:
-			return NULL;
+			return nullptr;
 	}
 }
 

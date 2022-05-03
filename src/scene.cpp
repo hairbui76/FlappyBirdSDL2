@@ -18,7 +18,6 @@ void SceneManager::DoFrame() {
 
 void SceneManager::Tick() {
 	for (size_t j = 0; j < sceneStack.size(); ++j) {
-		// std::cout << sceneStack.size() << std::endl;
 		sceneStack[j]->Tick();
 	}
 }
@@ -35,7 +34,6 @@ void SceneManager::Responder(Event* event) {
 
 		case CHANGE_SCENE: {
 			if (!strcmp(event->data, "GAME_SCENE")) {
-				std::cout << "hi" << std::endl;
 				ChangeScene(GAME);
 			}
 			break;
@@ -54,7 +52,7 @@ void SceneManager::ChangeScene(scene_e sceneTag) {
 			sceneStack.push_back(new TitleScene(eventManager));
 			break;
 		case GAME:
-			sceneStack.push_back(new GameScene(renderer, eventManager));
+			sceneStack.push_back(new GameScene(eventManager));
 			break;
 	};
 }

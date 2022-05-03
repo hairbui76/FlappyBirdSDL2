@@ -10,8 +10,8 @@ class GameScene : public Scene {
 	void DoPreRestart(EntityManager* entMan);
 	int maxScore;
 
-  public:
-	GameScene(Renderer* renderer, EventManager* eventManager);
+public:
+	GameScene(EventManager* eventManager);
 	~GameScene();
 
 	void DoFrame(Renderer* renderer);

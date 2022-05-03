@@ -15,7 +15,7 @@ class Renderer {
 	SDL_Renderer* renderer;
 	SDL_Texture* target;
 
-  public:
+public:
 	Renderer();
 	~Renderer();
 
@@ -24,5 +24,5 @@ class Renderer {
 	void DrawLine(int aX, int aY, int bX, int bY);
 	void Clear();
 	void Present();
-	Texture* GetTexture(texture_e tag);
+	static Texture* GetTexture(texture_e tag);
 };

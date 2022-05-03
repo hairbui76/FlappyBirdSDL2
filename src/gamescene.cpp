@@ -5,9 +5,8 @@
 #include "system.h"
 #include <iostream>
 
-GameScene::GameScene(Renderer* renderer, EventManager* eventManager) {
+GameScene::GameScene(EventManager* eventManager) {
 	this->eventManager = eventManager;
-	this->renderer = renderer;
 
 	entMan = new EntityManager;
 	maxScore = 0;
@@ -38,6 +37,7 @@ void GameScene::DoFrame(Renderer* renderer) {
 		}
 
 		// for (auto entity : entMan->entities) {
+		// 	// bird
 		// 	BlitSpriteSystem(entity, renderer, 2);
 		// }
 
@@ -52,10 +52,10 @@ void GameScene::DoFrame(Renderer* renderer) {
 
 void GameScene::Tick() {
 	for (auto entity : entMan->entities) {
-		// FlappyPhysicsSystem(entity);
+		FlappyPhysicsSystem(entity);
 		if (!restartFlag) {
 			PipeSpawnerTickSystem(entity, eventManager);
-			// PipeTickSystem(entity);
+			PipeTickSystem(entity);
 			// CollisionHandlerSystem(entMan, entity, eventManager);
 		}
 	}
@@ -76,16 +76,15 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 			}
 			break;
 
-			// case MOUSE_BUTT:
-			// 	if (restartFlag)
-			// 		Restart(eventManager);
-			// 	else {
-			// 		// for (auto entity : entMan->entities) {
-			// 		// 	std::cout << "hi";
-			// 		// 	FlappyInputSystem(entity);
-			// 		// }
-			// 	}
-			// 	break;
+		case MOUSE_BUTT:
+			// if (restartFlag)
+			// 	Restart(eventManager);
+			// else {
+			for (auto entity : entMan->entities) {
+				FlappyInputSystem(entity);
+			}
+			// }
+			break;
 
 		case SPAWN_PIPE:
 			SpawnPipe();
@@ -93,7 +92,7 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 
 		case GAME_RESTART:
 			restartFlag = true;
-			DoPreRestart(entMan);
+			// DoPreRestart(entMan);
 			break;
 
 		default:
@@ -110,7 +109,7 @@ void GameScene::PopulateWithInitEnts(EntityManager* entMan) {
 
 	Entity* ent1 = new Entity;
 	// gnd
-	ent1->position = new PositionComponent(0.0, WIN_Y - (renderer->GetTexture(TEX_GND)->h / 2));
+	ent1->position = new PositionComponent(0.0, WIN_Y - (Renderer::GetTexture(TEX_GND)->h / 2));
 	ent1->sprite = new SpriteComponent(TEX_GND, 1.0, 1);
 	ent1->spriteSpan = new SpriteSpanComponent(22);
 	ent1->anim = new AnimComponent(50, -0.1, 48, 160, 1);

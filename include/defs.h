@@ -38,7 +38,8 @@ enum texture_e {
 	TEX_FLAP,
 	TEX_MENU,
 	TEX_PIPE,
-	TEX_GND
+	TEX_GND,
+	DUNNO
 };
 
 enum scene_e {
