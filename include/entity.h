@@ -10,6 +10,7 @@ struct Entity {
 	Component* size = nullptr;
 	Component* score = nullptr;
 	Component* scoreListener = nullptr;
+	Component* clickListener = nullptr;
 	Component* clickable = nullptr;
 
 	Entity() = default;

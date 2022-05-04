@@ -3,17 +3,17 @@
 #include "scene.h"
 
 class GameScene : public Scene {
-	void populateEntity(EntityManager*& entMan);
-	void Restart(EventManager*& eventManager);
+	void populateEntity(EntityManager* entMan);
+	void Restart(EventManager* eventManager);
 	bool restartFlag;
-	void DoPreRestart(EntityManager*& entMan);
+	void DoPreRestart(EntityManager* entMan);
 	int maxScore;
 
 public:
-	GameScene(EventManager*& eventManager);
+	GameScene(EventManager* eventManager);
 	~GameScene();
 
-	void DoFrame(Renderer*& renderer);
+	void DoFrame(Renderer* renderer);
 	void Tick();
-	void Responder(Event*& event, EventManager*& eventManager);
+	void Responder(Event* event, EventManager* eventManager);
 };

@@ -2,7 +2,7 @@
 #include "defs.h"
 
 struct Texture {
-	Texture(SDL_Texture*& tex, int w, int h);
+	Texture(SDL_Texture* tex, int w, int h);
 
 	SDL_Texture* tex;
 	int w;

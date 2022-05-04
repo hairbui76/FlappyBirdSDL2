@@ -6,9 +6,9 @@ struct Renderer;
 struct EntityManager;
 
 struct Scene {
-	virtual void DoFrame(Renderer*& renderer) = 0;
+	virtual void DoFrame(Renderer* renderer) = 0;
 	virtual void Tick() = 0;
-	virtual void Responder(Event*& event, EventManager*& eventManager) = 0;
+	virtual void Responder(Event* event, EventManager* eventManager) = 0;
 
 	EntityManager* entMan;
 	EventManager* eventManager;
@@ -21,7 +21,7 @@ class SceneManager : public EventListener {
 	EventManager* eventManager;
 
 public:
-	SceneManager(Renderer*& renderer, EventManager*& eventManager);
+	SceneManager(Renderer* renderer, EventManager* eventManager);
 	virtual ~SceneManager() = default;
 
 	void DoFrame();

@@ -65,7 +65,8 @@ void App::PumpSystemEvents() {
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
-				eventManager->Post(new Event(MOUSE_BUTT, " "));
+				if (event.button.button == SDL_BUTTON_LEFT)
+					eventManager->Post(new Event(MOUSE_BUTT, " ", event.motion.x, event.motion.y));
 				break;
 
 			default:

@@ -4,7 +4,7 @@
 #include "titlescene.h"
 #include <iostream>
 
-SceneManager::SceneManager(Renderer*& renderer, EventManager*& eventManager) {
+SceneManager::SceneManager(Renderer* renderer, EventManager* eventManager) {
 	this->renderer = renderer;
 	this->eventManager = eventManager;
 

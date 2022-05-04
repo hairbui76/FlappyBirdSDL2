@@ -2,6 +2,8 @@
 #include "defs.h"
 #include "event.h"
 
+struct Entity;
+
 struct Component {
 	component_tag_e tag;
 	~Component() = default;
@@ -15,11 +17,12 @@ struct PositionComponent : Component {
 };
 
 struct SpriteComponent : Component {
-	SpriteComponent(texture_e tName, double scale, int layer);
+	SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
 
 	texture_e tName;
 	double scale;
 	int layer;
+	SDL_RendererFlip flip_flag;
 };
 
 struct RotateComponent : Component {
@@ -46,12 +49,18 @@ struct ScoreListenerComponent : Component, EventListener {
 	ScoreListenerComponent(ScoreComponent* scr);
 	void Responder(Event* event);
 
-	ScoreComponent* scr;
+	ScoreComponent* scr = nullptr;
 };
 
 struct ClickableComponent : Component {
-	ClickableComponent(int layer);
+	ClickableComponent();
 
 	bool isClicked;
-	int layer;
+};
+
+struct ClickListenerComponent : Component, EventListener {
+	ClickListenerComponent(Entity* entity);
+	void Responder(Event* event);
+
+	Entity* entity = nullptr;
 };

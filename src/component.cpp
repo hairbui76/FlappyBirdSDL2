@@ -1,4 +1,5 @@
 #include "component.h"
+#include "entity.h"
 
 PositionComponent::PositionComponent(double x, double y) {
 	this->tag = POSITION;
@@ -6,11 +7,12 @@ PositionComponent::PositionComponent(double x, double y) {
 	this->y = y;
 }
 
-SpriteComponent::SpriteComponent(texture_e tName, double scale, int layer) {
+SpriteComponent::SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag) {
 	this->tag = SPRITE;
 	this->tName = tName;
 	this->scale = scale;
 	this->layer = layer;
+	this->flip_flag = flip_flag;
 }
 
 RotateComponent::RotateComponent(double angle) {
@@ -41,8 +43,25 @@ void ScoreListenerComponent::Responder(Event* event) {
 	}
 }
 
-ClickableComponent::ClickableComponent(int layer) {
+ClickableComponent::ClickableComponent() {
 	this->tag = CLICKABLE;
 	this->isClicked = false;
-	this->layer = layer;
+}
+
+ClickListenerComponent::ClickListenerComponent(Entity* entity) {
+	this->tag = CLICKLISTENER;
+	this->entity = entity;
+}
+
+void ClickListenerComponent::Responder(Event* event) {
+	if (event->type == MOUSE_BUTT) {
+		if (entity->clickable && entity->position && entity->size) {
+			PositionComponent* position = (PositionComponent*)entity->position;
+			SizeComponent* size = (SizeComponent*)entity->size;
+			ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
+			if (event->x >= position->x && event->x <= position->x + size->w && event->y >= position->y && event->y <= position->y + size->h) {
+				clickable->isClicked = true;
+			}
+		}
+	}
 }

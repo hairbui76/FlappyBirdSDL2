@@ -41,12 +41,10 @@ std::string getTextureTag(texture_e tag) {
 			return "TEX_RIGHT";
 		case TEX_LUMBER_DEAD:
 			return "TEX_LUMBER_DEAD";
-		case TEX_LUMBER_BODY:
-			return "TEX_LUMBER_BODY";
-		case TEX_HAND_DOWN:
-			return "TEX_HAND_DOWN";
-		case TEX_HAND_UP:
-			return "TEX_HAND_UP";
+		case TEX_LUMBER_HOLDING:
+			return "TEX_LUMBER_HOLDING";
+		case TEX_LUMBER_CUTTING:
+			return "TEX_LUMBER_CUTTING";
 		case TEX_TEXT_TITLE:
 			return "TEX_TEXT_TITLE";
 		default:

@@ -16,7 +16,8 @@ enum component_tag_e {
 	POSITION,
 	SIZE,
 	ANGLE,
-	CLICKABLE,
+	CLICKLISTENER,
+	CLICKABLE
 };
 
 enum texture_e {
@@ -30,9 +31,8 @@ enum texture_e {
 	TEX_LEFT,
 	TEX_RIGHT,
 	TEX_LUMBER_DEAD,
-	TEX_LUMBER_BODY,
-	TEX_HAND_DOWN,
-	TEX_HAND_UP,
+	TEX_LUMBER_HOLDING,
+	TEX_LUMBER_CUTTING,
 	TEX_TEXT_TITLE
 };
 

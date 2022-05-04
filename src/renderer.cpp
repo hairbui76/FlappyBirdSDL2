@@ -15,9 +15,8 @@ static Texture* tex_refresh;
 static Texture* tex_left;
 static Texture* tex_right;
 
-static Texture* tex_lumber_body;
-static Texture* tex_hand_down;
-static Texture* tex_hand_up;
+static Texture* tex_lumber_holding;
+static Texture* tex_lumber_cutting;
 static Texture* tex_lumber_dead;
 
 static Texture* tex_text_title;
@@ -28,9 +27,9 @@ static SDL_Color white;
 static SDL_Color black;
 static SDL_Color yellow;
 
-static Texture* LoadTex(SDL_Renderer*& renderer, char const* fPath, bool text_mode = false, const char* text = "");
+static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mode = false, const char* text = "");
 
-Texture::Texture(SDL_Texture*& tex, int w, int h) {
+Texture::Texture(SDL_Texture* tex, int w, int h) {
 	this->tex = tex;
 	this->w = w;
 	this->h = h;
@@ -91,12 +90,10 @@ Renderer::Renderer() {
 	tex_right = LoadTex(renderer, "assets/right.bmp");
 	if (tex_right == nullptr) logSDLError("Unable to load tex_right: %s", SDL_GetError());
 	// lumberjack
-	tex_lumber_body = LoadTex(renderer, "assets/lumber_body.bmp");
-	if (tex_lumber_body == nullptr) logSDLError("Unable to load tex_lumber_body: %s", SDL_GetError());
-	tex_hand_down = LoadTex(renderer, "assets/hand_down.bmp");
-	if (tex_hand_down == nullptr) logSDLError("Unable to load tex_hand_down: %s", SDL_GetError());
-	tex_hand_up = LoadTex(renderer, "assets/hand_up.bmp");
-	if (tex_hand_up == nullptr) logSDLError("Unable to load tex_hand_up: %s", SDL_GetError());
+	tex_lumber_holding = LoadTex(renderer, "assets/lumber_holding.bmp");
+	if (tex_lumber_holding == nullptr) logSDLError("Unable to load tex_lumber_holding: %s", SDL_GetError());
+	tex_lumber_cutting = LoadTex(renderer, "assets/lumber_cutting.bmp");
+	if (tex_lumber_cutting == nullptr) logSDLError("Unable to load tex_lumber_cutting: %s", SDL_GetError());
 	tex_lumber_dead = LoadTex(renderer, "assets/lumber_dead.bmp");
 	if (tex_lumber_dead == nullptr) logSDLError("Unable to load tex_lumber_dead: %s", SDL_GetError());
 	// title text
@@ -114,9 +111,8 @@ Renderer::~Renderer() {
 	SDL_DestroyTexture(tex_refresh->tex);
 	SDL_DestroyTexture(tex_left->tex);
 	SDL_DestroyTexture(tex_right->tex);
-	SDL_DestroyTexture(tex_lumber_body->tex);
-	SDL_DestroyTexture(tex_hand_down->tex);
-	SDL_DestroyTexture(tex_hand_up->tex);
+	SDL_DestroyTexture(tex_lumber_holding->tex);
+	SDL_DestroyTexture(tex_lumber_cutting->tex);
 	SDL_DestroyTexture(tex_lumber_dead->tex);
 	SDL_DestroyTexture(tex_text_title->tex);
 	SDL_DestroyRenderer(renderer);
@@ -201,14 +197,11 @@ Texture* Renderer::GetTexture(texture_e tag) {
 		case TEX_LUMBER_DEAD:
 			return tex_lumber_dead;
 
-		case TEX_LUMBER_BODY:
-			return tex_lumber_body;
+		case TEX_LUMBER_HOLDING:
+			return tex_lumber_holding;
 
-		case TEX_HAND_DOWN:
-			return tex_hand_down;
-
-		case TEX_HAND_UP:
-			return tex_hand_up;
+		case TEX_LUMBER_CUTTING:
+			return tex_lumber_cutting;
 
 		case TEX_TEXT_TITLE:
 			return tex_text_title;
@@ -218,7 +211,7 @@ Texture* Renderer::GetTexture(texture_e tag) {
 	}
 }
 
-static Texture* LoadTex(SDL_Renderer*& renderer, char const* fPath, bool text_mode, const char* text) {
+static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mode, const char* text) {
 	SDL_Surface* surf;
 	if (text_mode)
 		surf = TTF_RenderText_Blended(font, text, black);

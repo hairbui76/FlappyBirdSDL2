@@ -12,11 +12,13 @@ enum event_type_e {
 };
 
 struct Event {
-	Event(event_type_e type, const char* data);
+	Event(event_type_e type, const char* data, double x = 0, double y = 0);
 	~Event() = default;
 
 	event_type_e type;
 	const char* data;
+	double x;
+	double y;
 };
 
 struct EventListener {

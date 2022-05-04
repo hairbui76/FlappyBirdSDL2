@@ -30,25 +30,22 @@ TitleScene::TitleScene(EventManager* eventManager) {
 	ent3->size = new SizeComponent(75, 36);
 	entMan->entities.push_back(ent3);
 
-	// lumberjack body
+	// lumberjack holding axe
 	Entity* ent4 = new Entity;
 	ent4->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
-	ent4->sprite = new SpriteComponent(TEX_LUMBER_BODY, 1.0, 0);
-	ent4->size = new SizeComponent(50, 107);
+	ent4->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 0);
+	ent4->size = new SizeComponent(70, 107);
 	entMan->entities.push_back(ent4);
-
-	// lumberjack hand up
-	Entity* ent5 = new Entity;
-	ent5->position = new PositionComponent(WIN_X / 2 + 60, WIN_Y - 365);
-	ent5->sprite = new SpriteComponent(TEX_HAND_UP, 1.0, 0);
-	ent5->size = new SizeComponent(47, 52);
-	entMan->entities.push_back(ent5);
 
 	// play button
 	Entity* ent6 = new Entity;
 	ent6->position = new PositionComponent((WIN_X - 120) / 2, WIN_Y - 160);
 	ent6->sprite = new SpriteComponent(TEX_PLAY, 1.0, 0);
 	ent6->size = new SizeComponent(120, 120);
+	ent6->clickable = new ClickableComponent();
+	ClickListenerComponent* clc = new ClickListenerComponent(ent6);
+	eventManager->AddListener(clc);
+	ent6->clickListener = clc;
 	entMan->entities.push_back(ent6);
 
 	// title game
@@ -62,7 +59,7 @@ TitleScene::~TitleScene() {
 	delete (entMan);
 }
 
-void TitleScene::DoFrame(Renderer*& renderer) {
+void TitleScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {
 		renderSpriteSystem(entity, renderer, 0);
 	}
@@ -74,7 +71,18 @@ void TitleScene::Tick() {
 	// }
 }
 
-void TitleScene::Responder(Event*& event, EventManager*& eventManager) {
-	if (event->type == MOUSE_BUTT && !strcmp(event->data, " "))
-		eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
+void TitleScene::Responder(Event* event, EventManager* eventManager) {
+	if (event->type == MOUSE_BUTT) {
+		for (auto entity : entMan->entities) {
+			if (entity->clickable) {
+				ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
+				if (clickable->isClicked) {
+					clickable->isClicked = false;
+					if (entity->clickListener) {
+						eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
+					}
+				}
+			}
+		}
+	}
 }
