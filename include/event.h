@@ -1,16 +1,6 @@
 #pragma once
 #include "defs.h"
 
-enum event_type_e {
-	QUIT,
-	CHANGE_SCENE,
-	KEYDOWN,
-	KILL_ENT,
-	GAME_RESTART,
-	INC_SCORE,
-	MOUSE_BUTT
-};
-
 struct Event {
 	Event(event_type_e type, const char* data, double x = 0, double y = 0);
 	~Event() = default;
@@ -33,7 +23,7 @@ class EventManager {
 
 public:
 	EventManager();
-	~EventManager() = default;
+	~EventManager();
 
 	void PumpEvents();
 	void AddListener(EventListener* listener);

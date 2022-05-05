@@ -16,9 +16,9 @@ App::App() {
 }
 
 App::~App() {
-	delete (renderer);
-	delete (eventManager);
-	delete (sceneManager);
+	delete renderer;
+	delete eventManager;
+	delete sceneManager;
 }
 
 void App::Run() {

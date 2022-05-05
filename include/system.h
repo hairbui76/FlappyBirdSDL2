@@ -6,5 +6,5 @@ struct EntityManager;
 class EventManager;
 class Entity;
 
-void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full = false, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
+void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full = false);
 void HudSystem(Entity* entity, Renderer* renderer);

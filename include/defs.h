@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include <cstring>
+#include <map>
 #include <queue>
 #include <random>
 #include <time.h>
@@ -8,6 +9,11 @@
 
 #define WIN_X 600
 #define WIN_Y 757
+
+enum move_tag_e {
+	LEFT,
+	RIGHT,
+};
 
 enum component_tag_e {
 	SPRITE,
@@ -17,7 +23,10 @@ enum component_tag_e {
 	SIZE,
 	ANGLE,
 	CLICKLISTENER,
-	CLICKABLE
+	CLICKABLE,
+	MOVABLE,
+	MOVELISTENER,
+	SPAWNER,
 };
 
 enum texture_e {
@@ -39,6 +48,17 @@ enum texture_e {
 enum scene_e {
 	TITLE,
 	GAME
+};
+
+enum event_type_e {
+	QUIT,
+	CHANGE_SCENE,
+	KEYDOWN,
+	KILL_ENT,
+	GAME_RESTART,
+	INC_SCORE,
+	MOUSE_BUTT,
+	SPAWN_BRANCH,
 };
 
 int getRandom(int a, int b);

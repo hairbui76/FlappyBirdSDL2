@@ -1,5 +1,6 @@
 #include "component.h"
 #include "entity.h"
+#include <iostream>
 
 PositionComponent::PositionComponent(double x, double y) {
 	this->tag = POSITION;
@@ -26,21 +27,29 @@ ScoreComponent::ScoreComponent(int maxScore) {
 	this->maxScore = maxScore;
 }
 
-ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr) {
-	this->tag = SCORELISTENER;
-	this->scr = scr;
-}
-
 SizeComponent::SizeComponent(double w, double h) {
 	this->tag = SIZE;
 	this->w = w;
 	this->h = h;
 }
 
+ScoreListenerComponent::~ScoreListenerComponent(void) {
+	delete this->scr;
+}
+
+ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr) {
+	this->tag = SCORELISTENER;
+	this->scr = scr;
+}
+
 void ScoreListenerComponent::Responder(Event* event) {
 	if (event->type == INC_SCORE) {
 		this->scr->score += 1;
 	}
+}
+
+ClickListenerComponent::~ClickListenerComponent(void) {
+	delete this->entity;
 }
 
 ClickableComponent::ClickableComponent() {
@@ -63,5 +72,44 @@ void ClickListenerComponent::Responder(Event* event) {
 				clickable->isClicked = true;
 			}
 		}
+	}
+}
+
+MovableComponent::MovableComponent() {
+	this->tag = MOVABLE;
+	this->state = getRandom(0, 1) ? LEFT : RIGHT;
+}
+
+MoveListenerComponent::MoveListenerComponent(Entity* entity) {
+	this->tag = MOVELISTENER;
+	this->entity = entity;
+}
+
+void MoveListenerComponent::Responder(Event* event) {
+	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		if (entity->movable) {
+			MovableComponent* movable = (MovableComponent*)entity->movable;
+			entity->size = new SizeComponent(87, 107);
+			// render new texture (lumber_holding)
+			if (!strcmp(event->data, "LEFT")) {
+				movable->state = LEFT;
+				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0, SDL_FLIP_HORIZONTAL);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 - 60, WIN_Y - 365);
+			} else if (!strcmp(event->data, "RIGHT")) {
+				movable->state = RIGHT;
+				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 + 30, WIN_Y - 365);
+			}
+		}
+	}
+}
+
+SpawnerComponent::SpawnerComponent() {
+	this->tag = SPAWNER;
+	this->flip_map[0] = (SDL_RendererFlip)2;
+	std::cout << this->flip_map[0] << std::endl;
+	for (int i = 1; i < 6; i++) {
+		SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+		this->flip_map[i] = flip_flag;
 	}
 }

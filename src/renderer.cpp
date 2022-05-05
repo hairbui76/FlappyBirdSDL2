@@ -122,17 +122,16 @@ Renderer::~Renderer() {
 	SDL_Quit();
 }
 
-void Renderer::renderSprite(double x, double y, int w, int h, double angle, Texture* tex, double scale, texture_e tag, bool full, SDL_RendererFlip flip_flag) {
-	SDL_FRect dQuad = {(float)x, (float)y, (float)(w * scale), (float)(h * scale)};
+void Renderer::renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, Texture* tex, texture_e tag, bool full, SDL_RendererFlip flip_flag) {
 	if (full) {
-		if (SDL_RenderCopyExF(renderer, tex->tex, NULL, NULL, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
+		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, NULL, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
 	} else {
-		if (SDL_RenderCopyExF(renderer, tex->tex, NULL, &dQuad, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
+		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, &dRect, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
 	}
 }
 
 void Renderer::Print(int x, int y, char const* text) {
-	SDL_Rect r = {x, y, 0, 0};
+	SDL_Rect r{x, y, 0, 0};
 	TTF_SizeText(font, text, &r.w, &r.h);
 	SDL_Surface* surf = TTF_RenderText_Solid(font, text, red);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);

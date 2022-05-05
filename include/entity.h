@@ -12,6 +12,9 @@ struct Entity {
 	Component* scoreListener = nullptr;
 	Component* clickListener = nullptr;
 	Component* clickable = nullptr;
+	Component* movable = nullptr;
+	Component* moveListener = nullptr;
+	Component* spawner = nullptr;
 
 	Entity() = default;
 	~Entity();

@@ -8,6 +8,11 @@ Entity::~Entity() {
 	delete size;
 	delete score;
 	delete scoreListener;
+	delete clickable;
+	delete clickListener;
+	delete movable;
+	delete moveListener;
+	delete spawner;
 }
 
 EntityManager::~EntityManager() {

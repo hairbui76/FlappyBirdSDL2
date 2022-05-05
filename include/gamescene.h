@@ -10,10 +10,9 @@ class GameScene : public Scene {
 	int maxScore;
 
 public:
-	GameScene(EventManager* eventManager);
 	~GameScene();
+	GameScene(EventManager* eventManager);
 
 	void DoFrame(Renderer* renderer);
-	void Tick();
 	void Responder(Event* event, EventManager* eventManager);
 };

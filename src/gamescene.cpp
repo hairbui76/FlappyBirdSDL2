@@ -36,40 +36,45 @@ void GameScene::DoFrame(Renderer* renderer) {
 	// }
 }
 
-void GameScene::Tick() {
-}
-
 void GameScene::Responder(Event* event, EventManager* eventManager) {
-	// std::cout << event->type << std::endl;
-	switch (event->type) {
-		case KEYDOWN:
-			if (strcmp(event->data, "ENTER") == 0) {
-				eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
-				// Restart(eventManager);
-			} else if (restartFlag) {
-				// Restart(eventManager);
-			} else {
+	if (event->type == MOUSE_BUTT) {
+		for (auto entity : entMan->entities) {
+			if (entity->clickable && entity->clickListener) {
+				ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
+				ClickListenerComponent* clc = (ClickListenerComponent*)entity->clickListener;
+				clickable->isClicked = false;
+				if (clc->entity->sprite) {
+					SpriteComponent* sprite = (SpriteComponent*)clc->entity->sprite;
+					if (sprite->tName == TEX_LEFT) {
+						eventManager->Post(new Event(KEYDOWN, "LEFT"));
+					}
+					if (sprite->tName == TEX_RIGHT) {
+						eventManager->Post(new Event(KEYDOWN, "RIGHT"));
+					}
+				}
 			}
-			break;
+		}
+	}
 
-		case MOUSE_BUTT:
-			// if (restartFlag)
-			// 	Restart(eventManager);
-			// else {
-			// }
-			break;
-
-		case GAME_RESTART:
-			restartFlag = true;
-			// DoPreRestart(entMan);
-			break;
-
-		default:
-			break;
+	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		for (auto entity : entMan->entities) {
+			if (entity->sprite && entity->spawner) {
+				SpriteComponent* sprite = (SpriteComponent*)entity->sprite;
+				if (sprite->tName == TEX_BRANCH) {
+					SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
+					// spawner->flip_flags.erase(spawner->flip_flags.begin(), spawner->flip_flags.begin() + 1);
+					// spawner->flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+					// spawner->flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+				}
+			}
+		}
 	}
 }
 
 void GameScene::populateEntity(EntityManager* entMan) {
+	//! NOTICE that ALL position are self calculated
+	//! BUT ALL size are shrinked a half to fit the scene
+
 	// background
 	Entity* ent1 = new Entity;
 	ent1->position = new PositionComponent(0.0, 0.0);
@@ -78,49 +83,59 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	entMan->entities.push_back(ent1);
 
 	// branch
-
-	// the trunk
 	Entity* ent2 = new Entity;
-	ent2->position = new PositionComponent((WIN_X - 50) / 2, 0);
-	ent2->sprite = new SpriteComponent(TEX_TRUNK, 1.0, 1);
-	ent2->size = new SizeComponent(50, 500);
+	ent2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 440);
+	ent2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1);
+	ent2->size = new SizeComponent(125, 80);
+	ent2->spawner = new SpawnerComponent();
 	entMan->entities.push_back(ent2);
 
-	// the stone
+	// the trunk
 	Entity* ent3 = new Entity;
-	ent3->position = new PositionComponent((WIN_X - 75) / 2, WIN_Y - 275);
-	ent3->sprite = new SpriteComponent(TEX_STONE, 1.0, 2);
-	ent3->size = new SizeComponent(75, 36);
+	ent3->position = new PositionComponent((WIN_X - 50) / 2, 0);
+	ent3->sprite = new SpriteComponent(TEX_TRUNK, 1.0, 2);
+	ent3->size = new SizeComponent(50, 500);
 	entMan->entities.push_back(ent3);
 
-	// lumberjack holding axe
+	// the stone
 	Entity* ent4 = new Entity;
-	ent4->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
-	ent4->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 2);
-	ent4->size = new SizeComponent(70, 107);
+	ent4->position = new PositionComponent((WIN_X - 75) / 2, WIN_Y - 275);
+	ent4->sprite = new SpriteComponent(TEX_STONE, 1.0, 3);
+	ent4->size = new SizeComponent(75, 36);
 	entMan->entities.push_back(ent4);
 
-	// left button
+	// lumberjack holding axe
 	Entity* ent5 = new Entity;
-	ent5->position = new PositionComponent((WIN_X - 120) / 5, WIN_Y - 160);
-	ent5->sprite = new SpriteComponent(TEX_LEFT, 1.0, 0);
-	ent5->size = new SizeComponent(120, 120);
-	ent5->clickable = new ClickableComponent();
-	ClickListenerComponent* clc1 = new ClickListenerComponent(ent5);
-	eventManager->AddListener(clc1);
-	ent5->clickListener = clc1;
+	ent5->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
+	ent5->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
+	ent5->size = new SizeComponent(70, 107);
+	ent5->movable = new MovableComponent();
+	MoveListenerComponent* mcl = new MoveListenerComponent(ent5);
+	ent5->moveListener = mcl;
+	eventManager->AddListener(mcl);
 	entMan->entities.push_back(ent5);
 
-	// right button
+	// left button
 	Entity* ent6 = new Entity;
-	ent6->position = new PositionComponent((WIN_X - 120) / 5 * 4, WIN_Y - 160);
-	ent6->sprite = new SpriteComponent(TEX_RIGHT, 1.0, 0);
+	ent6->position = new PositionComponent((WIN_X - 120) / 5, WIN_Y - 160);
+	ent6->sprite = new SpriteComponent(TEX_LEFT, 1.0, 0);
 	ent6->size = new SizeComponent(120, 120);
 	ent6->clickable = new ClickableComponent();
-	ClickListenerComponent* clc2 = new ClickListenerComponent(ent6);
-	eventManager->AddListener(clc2);
-	ent6->clickListener = clc2;
+	ClickListenerComponent* clc1 = new ClickListenerComponent(ent6);
+	eventManager->AddListener(clc1);
+	ent6->clickListener = clc1;
 	entMan->entities.push_back(ent6);
+
+	// right button
+	Entity* ent7 = new Entity;
+	ent7->position = new PositionComponent((WIN_X - 120) / 5 * 4, WIN_Y - 160);
+	ent7->sprite = new SpriteComponent(TEX_RIGHT, 1.0, 0);
+	ent7->size = new SizeComponent(120, 120);
+	ent7->clickable = new ClickableComponent();
+	ClickListenerComponent* clc2 = new ClickListenerComponent(ent7);
+	eventManager->AddListener(clc2);
+	ent7->clickListener = clc2;
+	entMan->entities.push_back(ent7);
 
 	// Entity* ent4 = new Entity;
 	// // score

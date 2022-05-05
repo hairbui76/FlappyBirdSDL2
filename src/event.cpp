@@ -13,6 +13,16 @@ EventManager::EventManager() {
 		eventQueue.pop();
 }
 
+EventManager::~EventManager() {
+	for (auto listener : listeners)
+		delete listener;
+	while (!eventQueue.empty()) {
+		Event* event = eventQueue.front();
+		delete event;
+		eventQueue.pop();
+	}
+}
+
 void EventManager::PumpEvents() {
 	while (!eventQueue.empty()) {
 		Event* event = eventQueue.front();

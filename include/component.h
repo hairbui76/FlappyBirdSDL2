@@ -6,7 +6,6 @@ struct Entity;
 
 struct Component {
 	component_tag_e tag;
-	~Component() = default;
 };
 
 struct PositionComponent : Component {
@@ -47,8 +46,9 @@ struct ScoreComponent : Component {
 
 struct ScoreListenerComponent : Component, EventListener {
 	ScoreListenerComponent(ScoreComponent* scr);
-	void Responder(Event* event);
+	~ScoreListenerComponent();
 
+	void Responder(Event* event);
 	ScoreComponent* scr = nullptr;
 };
 
@@ -60,7 +60,27 @@ struct ClickableComponent : Component {
 
 struct ClickListenerComponent : Component, EventListener {
 	ClickListenerComponent(Entity* entity);
+	~ClickListenerComponent();
+
+	void Responder(Event* event);
+	Entity* entity = nullptr;
+};
+
+struct MovableComponent : Component {
+	MovableComponent();
+
+	move_tag_e state;
+};
+
+struct MoveListenerComponent : Component, EventListener {
+	MoveListenerComponent(Entity* entity);
 	void Responder(Event* event);
 
 	Entity* entity = nullptr;
+};
+
+struct SpawnerComponent : Component {
+	SpawnerComponent();
+
+	std::map<int, SDL_RendererFlip> flip_map;
 };

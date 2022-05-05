@@ -18,7 +18,7 @@ public:
 	Renderer();
 	~Renderer();
 
-	void renderSprite(double x, double y, int w, int h, double angle, Texture* tex, double scale, texture_e tag, bool full = false, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
+	void renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, Texture* tex, texture_e tag, bool full = false, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
 	void Print(int x, int y, char const* text);
 	void DrawLine(int aX, int aY, int bX, int bY);
 	void Clear();

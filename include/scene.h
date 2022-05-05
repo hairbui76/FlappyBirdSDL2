@@ -7,8 +7,8 @@ struct EntityManager;
 
 struct Scene {
 	virtual void DoFrame(Renderer* renderer) = 0;
-	virtual void Tick() = 0;
 	virtual void Responder(Event* event, EventManager* eventManager) = 0;
+	virtual ~Scene() = default;
 
 	EntityManager* entMan;
 	EventManager* eventManager;
@@ -16,15 +16,14 @@ struct Scene {
 
 class SceneManager : public EventListener {
 	void ChangeScene(scene_e sceneTag);
-	std::vector<Scene*> sceneStack;
+	Scene* currentScene;
 	Renderer* renderer;
 	EventManager* eventManager;
 
 public:
+	virtual ~SceneManager();
 	SceneManager(Renderer* renderer, EventManager* eventManager);
-	virtual ~SceneManager() = default;
 
 	void DoFrame();
-	void Tick();
 	void Responder(Event* event);
 };

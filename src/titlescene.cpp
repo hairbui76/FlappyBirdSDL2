@@ -8,6 +8,8 @@
 TitleScene::TitleScene(EventManager* eventManager) {
 	entMan = new EntityManager;
 	this->eventManager = eventManager;
+	//! NOTICE that ALL position are self calculated
+	//! BUT ALL size are shrinked a half to fit the scene
 
 	// background
 	Entity* ent1 = new Entity;
@@ -65,12 +67,6 @@ void TitleScene::DoFrame(Renderer* renderer) {
 	}
 }
 
-void TitleScene::Tick() {
-	// for (auto entity : entMan->entities) {
-	// AngleTickSystem(entity);
-	// }
-}
-
 void TitleScene::Responder(Event* event, EventManager* eventManager) {
 	if (event->type == MOUSE_BUTT) {
 		for (auto entity : entMan->entities) {
@@ -78,11 +74,12 @@ void TitleScene::Responder(Event* event, EventManager* eventManager) {
 				ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
 				if (clickable->isClicked) {
 					clickable->isClicked = false;
-					if (entity->clickListener) {
-						eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
-					}
+					eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
 				}
 			}
 		}
+	}
+	if (event->type == KEYDOWN && !strcmp(event->data, "SPACE")) {
+		eventManager->Post(new Event(CHANGE_SCENE, "GAME_SCENE"));
 	}
 }

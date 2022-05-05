@@ -18,7 +18,6 @@ class App : public EventListener {
 public:
 	App();
 	~App();
-
 	void Run();
 	void Responder(Event* event);
 };
