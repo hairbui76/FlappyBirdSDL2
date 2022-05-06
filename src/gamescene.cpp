@@ -81,8 +81,6 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	// branch and trunk
 	Entity* ent2 = new Entity;
 	std::vector<SDL_RendererFlip> flip_flags;
-	for (int i = 1; i <= MAX_SPAWNER_COMPONENTS; i++)
-		flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 	SpawnerComponent* spawner = new SpawnerComponent;
 	for (int i = 1; i <= MAX_SPAWNER_COMPONENTS; i++) {
 		Entity* spawner_entity1 = new Entity;
@@ -91,20 +89,21 @@ void GameScene::populateEntity(EntityManager* entMan) {
 		spawner_entity1->size = new SizeComponent(50, Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS);
 		spawner_entity1->sprite = new SpriteComponent(TEX_TRUNK, 1.0, 2);
 
-		Entity* spawner_entity2 = new Entity;
-		SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-		if (flip_flag == SDL_FLIP_NONE)
-			spawner_entity2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 340 - i * 80);
-		else
-			spawner_entity2->position = new PositionComponent(WIN_X / 2 - 135, WIN_Y - 340 - i * 80);
-		spawner_entity2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1, flip_flag);
-		spawner_entity2->size = new SizeComponent(125, 80);
-		if (i == 1)
-			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
-		else if (flip_flags[i] == flip_flags[i + 1])
-			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, spawner_entity2));
-		else
-			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
+		spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
+	}
+	for (int i = 0; i < MAX_SPAWNER_COMPONENTS; i++) {
+		if (i % 2 != 0) {
+			Entity* spawner_entity2 = new Entity;
+			SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+			if (flip_flag == SDL_FLIP_NONE)
+				spawner_entity2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 340 - (i + 1) * 80);
+			else
+				spawner_entity2->position = new PositionComponent(WIN_X / 2 - 135, WIN_Y - 340 - (i + 1) * 80);
+			spawner_entity2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1, flip_flag);
+			spawner_entity2->size = new SizeComponent(125, 80);
+
+			spawner->spawner_entities[i].second = spawner_entity2;
+		}
 	}
 	ent2->spawner = spawner;
 	entMan->entities.push_back(ent2);
