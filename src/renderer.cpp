@@ -42,16 +42,16 @@ Renderer::Renderer() {
 	if (TTF_Init() != 0) logSDLError("Unable to initialize SDL_ttf: %s", TTF_GetError());
 	// create window
 	window = SDL_CreateWindow("Branch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_X, WIN_Y, SDL_WINDOW_RESIZABLE);
-	if (window == nullptr) logSDLError("Unable to create window: %s", SDL_GetError());
+	if (!window) logSDLError("Unable to create window: %s", SDL_GetError());
 	// create renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (renderer == nullptr) logSDLError("Unable to create renderer: %s", SDL_GetError());
+	if (!renderer) logSDLError("Unable to create renderer: %s", SDL_GetError());
 	// set fixed size
 	SDL_RenderSetLogicalSize(renderer, WIN_X, WIN_Y);
 	target = nullptr;
 
 	font = TTF_OpenFont("assets/charter-sc-itc-tt.ttf", 80);
-	if (font == nullptr) logSDLError("Unable to load font: %s", TTF_GetError());
+	if (!font) logSDLError("Unable to load font: %s", TTF_GetError());
 	red.r = 155;
 	red.g = 50;
 	red.b = 50;
@@ -71,34 +71,34 @@ Renderer::Renderer() {
 
 	// resources background
 	tex_bg = LoadTex(renderer, "assets/bg.bmp");
-	if (tex_bg == nullptr) logSDLError("Unable to load tex_bg: %s", SDL_GetError());
+	if (!tex_bg) logSDLError("Unable to load tex_bg: %s", SDL_GetError());
 	tex_branch = LoadTex(renderer, "assets/branch.bmp");
-	if (tex_branch == nullptr) logSDLError("Unable to load tex_branch: %s", SDL_GetError());
+	if (!tex_branch) logSDLError("Unable to load tex_branch: %s", SDL_GetError());
 	tex_log = LoadTex(renderer, "assets/log.bmp");
-	if (tex_log == nullptr) logSDLError("Unable to load tex_log: %s", SDL_GetError());
+	if (!tex_log) logSDLError("Unable to load tex_log: %s", SDL_GetError());
 	tex_stone = LoadTex(renderer, "assets/stone.bmp");
-	if (tex_stone == nullptr) logSDLError("Unable to load tex_stone: %s", SDL_GetError());
+	if (!tex_stone) logSDLError("Unable to load tex_stone: %s", SDL_GetError());
 	tex_trunk = LoadTex(renderer, "assets/trunk.bmp");
-	if (tex_trunk == nullptr) logSDLError("Unable to load tex_trunk: %s", SDL_GetError());
+	if (!tex_trunk) logSDLError("Unable to load tex_trunk: %s", SDL_GetError());
 	// button
 	tex_play = LoadTex(renderer, "assets/play.bmp");
-	if (tex_play == nullptr) logSDLError("Unable to load tex_play: %s", SDL_GetError());
+	if (!tex_play) logSDLError("Unable to load tex_play: %s", SDL_GetError());
 	tex_refresh = LoadTex(renderer, "assets/refresh.bmp");
-	if (tex_refresh == nullptr) logSDLError("Unable to load tex_refresh: %s", SDL_GetError());
+	if (!tex_refresh) logSDLError("Unable to load tex_refresh: %s", SDL_GetError());
 	tex_left = LoadTex(renderer, "assets/left.bmp");
-	if (tex_left == nullptr) logSDLError("Unable to load tex_left: %s", SDL_GetError());
+	if (!tex_left) logSDLError("Unable to load tex_left: %s", SDL_GetError());
 	tex_right = LoadTex(renderer, "assets/right.bmp");
-	if (tex_right == nullptr) logSDLError("Unable to load tex_right: %s", SDL_GetError());
+	if (!tex_right) logSDLError("Unable to load tex_right: %s", SDL_GetError());
 	// lumberjack
 	tex_lumber_holding = LoadTex(renderer, "assets/lumber_holding.bmp");
-	if (tex_lumber_holding == nullptr) logSDLError("Unable to load tex_lumber_holding: %s", SDL_GetError());
+	if (!tex_lumber_holding) logSDLError("Unable to load tex_lumber_holding: %s", SDL_GetError());
 	tex_lumber_cutting = LoadTex(renderer, "assets/lumber_cutting.bmp");
-	if (tex_lumber_cutting == nullptr) logSDLError("Unable to load tex_lumber_cutting: %s", SDL_GetError());
+	if (!tex_lumber_cutting) logSDLError("Unable to load tex_lumber_cutting: %s", SDL_GetError());
 	tex_lumber_dead = LoadTex(renderer, "assets/lumber_dead.bmp");
-	if (tex_lumber_dead == nullptr) logSDLError("Unable to load tex_lumber_dead: %s", SDL_GetError());
+	if (!tex_lumber_dead) logSDLError("Unable to load tex_lumber_dead: %s", SDL_GetError());
 	// title text
 	tex_text_title = LoadTex(renderer, " ", true, "Lumberjack");
-	if (tex_text_title == nullptr) logSDLError("Unable to load tex_text_title: %s", TTF_GetError());
+	if (!tex_text_title) logSDLError("Unable to load tex_text_title: %s", TTF_GetError());
 }
 
 Renderer::~Renderer() {

@@ -5,14 +5,17 @@
 #include <queue>
 #include <random>
 #include <time.h>
+#include <utility>
 #include <vector>
 
 #define WIN_X 600
 #define WIN_Y 757
+#define MAX_SPAWNER_COMPONENTS 8
 
 enum move_tag_e {
 	LEFT,
 	RIGHT,
+	NONE
 };
 
 enum component_tag_e {
@@ -27,6 +30,7 @@ enum component_tag_e {
 	MOVABLE,
 	MOVELISTENER,
 	SPAWNER,
+	CUTTABLE
 };
 
 enum texture_e {
@@ -47,7 +51,8 @@ enum texture_e {
 
 enum scene_e {
 	TITLE,
-	GAME
+	GAME,
+	END
 };
 
 enum event_type_e {

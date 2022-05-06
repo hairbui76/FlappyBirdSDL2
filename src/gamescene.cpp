@@ -1,5 +1,6 @@
 #include "gamescene.h"
 #include "component.h"
+#include "defs.h"
 #include "entity.h"
 #include "renderer.h"
 #include "system.h"
@@ -14,18 +15,12 @@ GameScene::GameScene(EventManager* eventManager) {
 	populateEntity(entMan);
 }
 
-GameScene::~GameScene() {
-	delete (entMan);
-}
-
 void GameScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {
 		// background (layer 0)
 		renderSpriteSystem(entity, renderer, 0);
-		// branch (layer 1)
+		// branch and trunk (layer 1)
 		renderSpriteSystem(entity, renderer, 1);
-		// trunk (layer 2)
-		renderSpriteSystem(entity, renderer, 2);
 		// lumberjack (and stone) (layer 3)
 		renderSpriteSystem(entity, renderer, 3);
 	}
@@ -62,9 +57,10 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 				SpriteComponent* sprite = (SpriteComponent*)entity->sprite;
 				if (sprite->tName == TEX_BRANCH) {
 					SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
-					// spawner->flip_flags.erase(spawner->flip_flags.begin(), spawner->flip_flags.begin() + 1);
-					// spawner->flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
-					// spawner->flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+					// for (int i = 0; i < 5; ++i) {
+					// 	spawner->flip_flags[i] = spawner->flip_flags[i + 1];
+					// }
+					// spawner->flip_flags[5] = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 				}
 			}
 		}
@@ -82,20 +78,36 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	ent1->size = new SizeComponent(WIN_X, WIN_Y - 200);
 	entMan->entities.push_back(ent1);
 
-	// branch
+	// branch and trunk
 	Entity* ent2 = new Entity;
-	ent2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 440);
-	ent2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1);
-	ent2->size = new SizeComponent(125, 80);
-	ent2->spawner = new SpawnerComponent();
-	entMan->entities.push_back(ent2);
+	std::vector<SDL_RendererFlip> flip_flags;
+	for (int i = 1; i <= MAX_SPAWNER_COMPONENTS; i++)
+		flip_flags.push_back(getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+	SpawnerComponent* spawner = new SpawnerComponent;
+	for (int i = 1; i <= MAX_SPAWNER_COMPONENTS; i++) {
+		Entity* spawner_entity1 = new Entity;
+		spawner_entity1->position = new PositionComponent((WIN_X - 50) / 2, WIN_Y - 265 - Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS * i);
+		spawner_entity1->cuttable = new CuttableComponent(0, Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS * (MAX_SPAWNER_COMPONENTS - i), Renderer::GetTexture(TEX_TRUNK)->w, Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS);
+		spawner_entity1->size = new SizeComponent(50, Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS);
+		spawner_entity1->sprite = new SpriteComponent(TEX_TRUNK, 1.0, 2);
 
-	// the trunk
-	Entity* ent3 = new Entity;
-	ent3->position = new PositionComponent((WIN_X - 50) / 2, 0);
-	ent3->sprite = new SpriteComponent(TEX_TRUNK, 1.0, 2);
-	ent3->size = new SizeComponent(50, 500);
-	entMan->entities.push_back(ent3);
+		Entity* spawner_entity2 = new Entity;
+		SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+		if (flip_flag == SDL_FLIP_NONE)
+			spawner_entity2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 340 - i * 80);
+		else
+			spawner_entity2->position = new PositionComponent(WIN_X / 2 - 135, WIN_Y - 340 - i * 80);
+		spawner_entity2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1, flip_flag);
+		spawner_entity2->size = new SizeComponent(125, 80);
+		if (i == 1)
+			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
+		else if (flip_flags[i] == flip_flags[i + 1])
+			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, spawner_entity2));
+		else
+			spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
+	}
+	ent2->spawner = spawner;
+	entMan->entities.push_back(ent2);
 
 	// the stone
 	Entity* ent4 = new Entity;

@@ -14,8 +14,6 @@ EventManager::EventManager() {
 }
 
 EventManager::~EventManager() {
-	for (auto listener : listeners)
-		delete listener;
 	while (!eventQueue.empty()) {
 		Event* event = eventQueue.front();
 		delete event;

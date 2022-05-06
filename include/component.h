@@ -46,7 +46,6 @@ struct ScoreComponent : Component {
 
 struct ScoreListenerComponent : Component, EventListener {
 	ScoreListenerComponent(ScoreComponent* scr);
-	~ScoreListenerComponent();
 
 	void Responder(Event* event);
 	ScoreComponent* scr = nullptr;
@@ -60,7 +59,6 @@ struct ClickableComponent : Component {
 
 struct ClickListenerComponent : Component, EventListener {
 	ClickListenerComponent(Entity* entity);
-	~ClickListenerComponent();
 
 	void Responder(Event* event);
 	Entity* entity = nullptr;
@@ -82,5 +80,11 @@ struct MoveListenerComponent : Component, EventListener {
 struct SpawnerComponent : Component {
 	SpawnerComponent();
 
-	std::map<int, SDL_RendererFlip> flip_map;
+	std::vector<std::pair<Entity*, Entity*>> spawner_entities;
+};
+
+struct CuttableComponent : Component {
+	CuttableComponent(int origin_x, int origin_y, int cut_width, int cut_height);
+
+	int origin_x, origin_y, cut_width, cut_height;
 };

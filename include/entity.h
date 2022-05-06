@@ -4,19 +4,20 @@
 struct Component;
 
 struct Entity {
-	Component* position = nullptr;
-	Component* sprite = nullptr;
-	Component* angle = nullptr;
-	Component* size = nullptr;
-	Component* score = nullptr;
-	Component* scoreListener = nullptr;
-	Component* clickListener = nullptr;
-	Component* clickable = nullptr;
-	Component* movable = nullptr;
-	Component* moveListener = nullptr;
-	Component* spawner = nullptr;
+	Component* position;
+	Component* sprite;
+	Component* angle;
+	Component* size;
+	Component* score;
+	Component* scoreListener;
+	Component* clickListener;
+	Component* clickable;
+	Component* movable;
+	Component* moveListener;
+	Component* spawner;
+	Component* cuttable;
 
-	Entity() = default;
+	Entity();
 	~Entity();
 };
 

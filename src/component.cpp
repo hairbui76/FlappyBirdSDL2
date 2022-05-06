@@ -33,10 +33,6 @@ SizeComponent::SizeComponent(double w, double h) {
 	this->h = h;
 }
 
-ScoreListenerComponent::~ScoreListenerComponent(void) {
-	delete this->scr;
-}
-
 ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr) {
 	this->tag = SCORELISTENER;
 	this->scr = scr;
@@ -46,10 +42,6 @@ void ScoreListenerComponent::Responder(Event* event) {
 	if (event->type == INC_SCORE) {
 		this->scr->score += 1;
 	}
-}
-
-ClickListenerComponent::~ClickListenerComponent(void) {
-	delete this->entity;
 }
 
 ClickableComponent::ClickableComponent() {
@@ -106,10 +98,12 @@ void MoveListenerComponent::Responder(Event* event) {
 
 SpawnerComponent::SpawnerComponent() {
 	this->tag = SPAWNER;
-	this->flip_map[0] = (SDL_RendererFlip)2;
-	std::cout << this->flip_map[0] << std::endl;
-	for (int i = 1; i < 6; i++) {
-		SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-		this->flip_map[i] = flip_flag;
-	}
 }
+
+CuttableComponent::CuttableComponent(int origin_x, int origin_y, int cut_width, int cut_height) {
+	this->tag = CUTTABLE;
+	this->origin_x = origin_x;
+	this->origin_y = origin_y;
+	this->cut_width = cut_width;
+	this->cut_height = cut_height;
+};

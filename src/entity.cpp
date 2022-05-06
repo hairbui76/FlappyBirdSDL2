@@ -1,6 +1,21 @@
 #include "entity.h"
 #include "component.h"
 
+Entity::Entity() {
+	this->position = nullptr;
+	this->sprite = nullptr;
+	this->angle = nullptr;
+	this->size = nullptr;
+	this->score = nullptr;
+	this->scoreListener = nullptr;
+	this->clickListener = nullptr;
+	this->clickable = nullptr;
+	this->movable = nullptr;
+	this->moveListener = nullptr;
+	this->spawner = nullptr;
+	this->cuttable = nullptr;
+}
+
 Entity::~Entity() {
 	delete position;
 	delete sprite;
@@ -13,6 +28,7 @@ Entity::~Entity() {
 	delete movable;
 	delete moveListener;
 	delete spawner;
+	delete cuttable;
 }
 
 EntityManager::~EntityManager() {

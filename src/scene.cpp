@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "endscene.h"
 #include "gamescene.h"
 #include "renderer.h"
 #include "titlescene.h"
@@ -25,6 +26,9 @@ void SceneManager::Responder(Event* event) {
 			if (!strcmp(event->data, "GAME_SCENE")) {
 				ChangeScene(GAME);
 			}
+			if (!strcmp(event->data, "END_SCENE")) {
+				ChangeScene(END);
+			}
 			break;
 		}
 
@@ -34,13 +38,16 @@ void SceneManager::Responder(Event* event) {
 	}
 }
 
-void SceneManager::ChangeScene(scene_e sceneTag) {
+void SceneManager::ChangeScene(scene_e sceneTag, move_tag_e move_state) {
 	switch (sceneTag) {
 		case TITLE:
 			currentScene = new TitleScene(eventManager);
 			break;
 		case GAME:
 			currentScene = new GameScene(eventManager);
+			break;
+		case END:
+			currentScene = new EndScene(eventManager, move_state);
 			break;
 		default:
 			break;

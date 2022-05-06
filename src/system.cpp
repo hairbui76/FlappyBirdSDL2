@@ -22,7 +22,7 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 		double h = tex->h;
 		double scale = spr->scale;
 		double angle = 0.0;
-		SDL_RendererFlip flip_flag = SDL_FLIP_NONE;
+		SDL_RendererFlip flip_flag = spr->flip_flag;
 
 		if (entity->angle) {
 			RotateComponent* r = (RotateComponent*)entity->angle;
@@ -45,21 +45,28 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 		if (SDL_QueryTexture(tex->tex, NULL, NULL, &sRect.w, &sRect.h))
 			logSDLError("Unable to query texture: %s", SDL_GetError());
 
-		if (entity->spawner) {
-			SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
-			for (auto const& e : spawner->flip_map) {
-				if (e.second == 2) {
-				}
+		if (entity->cuttable) {
+			CuttableComponent* cuttable = (CuttableComponent*)entity->cuttable;
+			sRect = {cuttable->origin_x, cuttable->origin_y, cuttable->cut_width, cuttable->cut_height};
+			dRect = {(float)x, (float)y, (float)(w * scale), (float)(h * scale)};
+			renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
+			return;
+		}
+		renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
+		return;
+	}
+	if (entity->spawner) {
+		SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
+		for (auto spawner_entity : spawner->spawner_entities) {
+			if (spawner_entity.second) {
+				renderSpriteSystem(spawner_entity.second, renderer, layer, full);
+				renderSpriteSystem(spawner_entity.first, renderer, layer + 1, full);
+			} else {
+				renderSpriteSystem(spawner_entity.first, renderer, layer + 1, full);
 			}
-			// if (spawner->flip_flags[i] == SDL_FLIP_HORIZONTAL)
-			// 	dRect = {(float)(x - w * scale - 20), (float)(y - (h * i)), (float)(w * scale), (float)(h * scale)};
-			// else
-			// 	dRect = {(float)x, (float)(y - (h * i)), (float)(w * scale), (float)(h * scale)};
-			// renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, spawner->flip_flags[i]);
 		}
 		return;
 	}
-	renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
 }
 
 void HudSystem(Entity* entity, Renderer* renderer) {
