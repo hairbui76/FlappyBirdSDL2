@@ -69,8 +69,7 @@ void ClickListenerComponent::Responder(Event* event) {
 
 MovableComponent::MovableComponent() {
 	this->tag = MOVABLE;
-	this->state = getRandom(0, 1) ? LEFT : RIGHT;
-	this->is_moved = false;
+	this->state = RIGHT;
 }
 
 MoveListenerComponent::MoveListenerComponent(Entity* entity) {
