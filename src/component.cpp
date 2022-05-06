@@ -70,6 +70,7 @@ void ClickListenerComponent::Responder(Event* event) {
 MovableComponent::MovableComponent() {
 	this->tag = MOVABLE;
 	this->state = getRandom(0, 1) ? LEFT : RIGHT;
+	this->is_moved = false;
 }
 
 MoveListenerComponent::MoveListenerComponent(Entity* entity) {
@@ -86,11 +87,11 @@ void MoveListenerComponent::Responder(Event* event) {
 			if (!strcmp(event->data, "LEFT")) {
 				movable->state = LEFT;
 				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0, SDL_FLIP_HORIZONTAL);
-				entity->position = new PositionComponent((WIN_X - 50) / 2 - 60, WIN_Y - 365);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 - 70, WIN_Y - 350);
 			} else if (!strcmp(event->data, "RIGHT")) {
 				movable->state = RIGHT;
 				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0);
-				entity->position = new PositionComponent((WIN_X - 50) / 2 + 30, WIN_Y - 365);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 + 30, WIN_Y - 350);
 			}
 		}
 	}

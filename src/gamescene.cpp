@@ -32,24 +32,24 @@ void GameScene::DoFrame(Renderer* renderer) {
 }
 
 void GameScene::Responder(Event* event, EventManager* eventManager) {
-	if (event->type == MOUSE_BUTT) {
-		for (auto entity : entMan->entities) {
-			if (entity->clickable && entity->clickListener) {
-				ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
-				ClickListenerComponent* clc = (ClickListenerComponent*)entity->clickListener;
-				clickable->isClicked = false;
-				if (clc->entity->sprite) {
-					SpriteComponent* sprite = (SpriteComponent*)clc->entity->sprite;
-					if (sprite->tName == TEX_LEFT) {
-						eventManager->Post(new Event(KEYDOWN, "LEFT"));
-					}
-					if (sprite->tName == TEX_RIGHT) {
-						eventManager->Post(new Event(KEYDOWN, "RIGHT"));
-					}
-				}
-			}
-		}
-	}
+	// if (event->type == MOUSE_BUTT) {
+	// 	for (auto entity : entMan->entities) {
+	// 		if (entity->clickable && entity->clickListener) {
+	// 			ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
+	// 			ClickListenerComponent* clc = (ClickListenerComponent*)entity->clickListener;
+	// 			clickable->isClicked = false;
+	// 			if (clc->entity->sprite) {
+	// 				SpriteComponent* sprite = (SpriteComponent*)clc->entity->sprite;
+	// 				if (sprite->tName == TEX_LEFT) {
+	// 					eventManager->Post(new Event(KEYDOWN, "LEFT"));
+	// 				}
+	// 				if (sprite->tName == TEX_RIGHT) {
+	// 					eventManager->Post(new Event(KEYDOWN, "RIGHT"));
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
 		for (auto entity : entMan->entities) {
@@ -96,9 +96,9 @@ void GameScene::populateEntity(EntityManager* entMan) {
 			Entity* spawner_entity2 = new Entity;
 			SDL_RendererFlip flip_flag = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 			if (flip_flag == SDL_FLIP_NONE)
-				spawner_entity2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 340 - (i + 1) * 80);
+				spawner_entity2->position = new PositionComponent(WIN_X / 2 + 10, WIN_Y - 340 - i * 80);
 			else
-				spawner_entity2->position = new PositionComponent(WIN_X / 2 - 135, WIN_Y - 340 - (i + 1) * 80);
+				spawner_entity2->position = new PositionComponent(WIN_X / 2 - 135, WIN_Y - 340 - i * 80);
 			spawner_entity2->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 1, flip_flag);
 			spawner_entity2->size = new SizeComponent(125, 80);
 
@@ -117,7 +117,7 @@ void GameScene::populateEntity(EntityManager* entMan) {
 
 	// lumberjack holding axe
 	Entity* ent5 = new Entity;
-	ent5->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
+	ent5->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
 	ent5->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
 	ent5->size = new SizeComponent(70, 107);
 	ent5->movable = new MovableComponent();

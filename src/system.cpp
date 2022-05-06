@@ -37,7 +37,10 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 
 		if (entity->movable) {
 			MovableComponent* m = (MovableComponent*)entity->movable;
-			flip_flag = m->state == LEFT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+			if (m->is_moved) {
+				m->is_moved = false;
+				flip_flag = m->state == LEFT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+			}
 		}
 
 		SDL_Rect sRect{0, 0, 0, 0};

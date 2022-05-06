@@ -34,7 +34,7 @@ TitleScene::TitleScene(EventManager* eventManager) {
 
 	// lumberjack holding axe
 	Entity* ent4 = new Entity;
-	ent4->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 365);
+	ent4->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
 	ent4->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 0);
 	ent4->size = new SizeComponent(70, 107);
 	entMan->entities.push_back(ent4);

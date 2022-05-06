@@ -68,6 +68,7 @@ struct MovableComponent : Component {
 	MovableComponent();
 
 	move_tag_e state;
+	bool is_moved;
 };
 
 struct MoveListenerComponent : Component, EventListener {
