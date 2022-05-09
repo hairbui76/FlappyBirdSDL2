@@ -53,19 +53,44 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 			return;
 		}
 		renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
-		return;
 	}
+}
+
+void animationSystem(Entity* entity, Renderer* renderer, int layer) {
+	if (entity->animation) {
+		AnimationComponent* animation = (AnimationComponent*)entity->animation;
+		if (animation->animation_entities.size() > 0) {
+			Entity* entity = animation->animation_entities[animation->current_frame];
+			renderSpriteSystem(entity, renderer, layer);
+		}
+	}
+}
+
+void spawnerSystem(Entity* entity, Renderer* renderer, int layer) {
 	if (entity->spawner) {
 		SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
 		for (auto spawner_entity : spawner->spawner_entities) {
 			if (spawner_entity.second) {
-				renderSpriteSystem(spawner_entity.second, renderer, layer, full);
-				renderSpriteSystem(spawner_entity.first, renderer, layer + 1, full);
+				renderSpriteSystem(spawner_entity.second, renderer, layer);
+				renderSpriteSystem(spawner_entity.first, renderer, layer + 1);
 			} else {
-				renderSpriteSystem(spawner_entity.first, renderer, layer + 1, full);
+				renderSpriteSystem(spawner_entity.first, renderer, layer + 1);
 			}
 		}
-		return;
+	}
+}
+
+void moveEntitySystem(Entity* entity) {
+	if (entity->movable) {
+		MovableComponent* movable = (MovableComponent*)entity->movable;
+		if (movable->state == LEFT) {
+			if (entity->animation) {
+				AnimationComponent* animation = (AnimationComponent*)entity->animation;
+				Entity* animation_entity1 = animation->animation_entities[animation->current_frame];
+				animation_entity1->position = new PositionComponent();
+				animation->current_frame++;
+			}
+		}
 	}
 }
 

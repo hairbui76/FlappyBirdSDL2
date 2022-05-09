@@ -100,4 +100,5 @@ struct AnimationComponent : Component {
 	AnimationComponent();
 
 	std::vector<Entity*> animation_entities;
+	int current_frame;
 };

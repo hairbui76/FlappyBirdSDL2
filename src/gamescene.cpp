@@ -19,10 +19,12 @@ void GameScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {
 		// background (layer 0)
 		renderSpriteSystem(entity, renderer, 0);
-		// branch and trunk (layer 1)
-		renderSpriteSystem(entity, renderer, 1);
-		// lumberjack (and stone) (layer 3)
+		// branch and trunk (layer 1 & 2)
+		spawnerSystem(entity, renderer, 1);
+		// stone (layer 3)
 		renderSpriteSystem(entity, renderer, 3);
+		// lumberjack (layer 3)
+		animationSystem(entity, renderer, 3);
 	}
 
 	// for (auto entity : entMan->entities) {
@@ -127,12 +129,24 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	ent4->size = new SizeComponent(75, 36);
 	entMan->entities.push_back(ent4);
 
-	// lumberjack holding axe
+	// lumberjack
 	Entity* ent5 = new Entity;
-	ent5->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
-	ent5->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
-	ent5->size = new SizeComponent(70, 107);
-	ent5->animation = new AnimationComponent();
+	AnimationComponent* animation = new AnimationComponent();
+	// lumberjack holding axe
+	Entity* animation_entity1 = new Entity;
+	animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
+	animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
+	animation_entity1->size = new SizeComponent(70, 107);
+	animation->animation_entities.push_back(animation_entity1);
+	// lumberjack cutting axe
+	Entity* animation_entity2 = new Entity;
+	animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 + 30, WIN_Y - 350);
+	animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3);
+	animation_entity2->size = new SizeComponent(87, 107);
+	animation->animation_entities.push_back(animation_entity2);
+
+	ent5->animation = animation;
+	// handle moving event
 	ent5->movable = new MovableComponent();
 	MoveListenerComponent* mcl = new MoveListenerComponent(ent5);
 	ent5->moveListener = mcl;

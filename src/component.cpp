@@ -82,16 +82,10 @@ void MoveListenerComponent::Responder(Event* event) {
 	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
 		if (entity->movable) {
 			MovableComponent* movable = (MovableComponent*)entity->movable;
-			entity->size = new SizeComponent(87, 107);
-			// render new texture (lumber_holding)
 			if (!strcmp(event->data, "LEFT")) {
 				movable->state = LEFT;
-				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0, SDL_FLIP_HORIZONTAL);
-				entity->position = new PositionComponent((WIN_X - 50) / 2 - 70, WIN_Y - 350);
 			} else if (!strcmp(event->data, "RIGHT")) {
 				movable->state = RIGHT;
-				entity->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 0);
-				entity->position = new PositionComponent((WIN_X - 50) / 2 + 30, WIN_Y - 350);
 			}
 		}
 	}
@@ -168,4 +162,5 @@ CuttableComponent::CuttableComponent(int origin_x, int origin_y, int cut_width, 
 
 AnimationComponent::AnimationComponent() {
 	this->tag = ANIMATION;
+	this->current_frame = 0;
 }
