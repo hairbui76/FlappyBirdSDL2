@@ -30,7 +30,9 @@ enum component_tag_e {
 	MOVABLE,
 	MOVELISTENER,
 	SPAWNER,
-	CUTTABLE
+	SPAWNERLISTENER,
+	CUTTABLE,
+	ANIMATION
 };
 
 enum texture_e {

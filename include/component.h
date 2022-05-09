@@ -83,8 +83,21 @@ struct SpawnerComponent : Component {
 	std::vector<std::pair<Entity*, Entity*>> spawner_entities;
 };
 
+struct SpawnerListenerComponent : Component, EventListener {
+	SpawnerListenerComponent(Entity* entity);
+
+	void Responder(Event* event);
+	Entity* entity = nullptr;
+};
+
 struct CuttableComponent : Component {
 	CuttableComponent(int origin_x, int origin_y, int cut_width, int cut_height);
 
 	int origin_x, origin_y, cut_width, cut_height;
+};
+
+struct AnimationComponent : Component {
+	AnimationComponent();
+
+	std::vector<Entity*> animation_entities;
 };

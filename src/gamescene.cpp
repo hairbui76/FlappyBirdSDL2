@@ -32,38 +32,45 @@ void GameScene::DoFrame(Renderer* renderer) {
 }
 
 void GameScene::Responder(Event* event, EventManager* eventManager) {
-	// if (event->type == MOUSE_BUTT) {
-	// 	for (auto entity : entMan->entities) {
-	// 		if (entity->clickable && entity->clickListener) {
-	// 			ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
-	// 			ClickListenerComponent* clc = (ClickListenerComponent*)entity->clickListener;
-	// 			clickable->isClicked = false;
-	// 			if (clc->entity->sprite) {
-	// 				SpriteComponent* sprite = (SpriteComponent*)clc->entity->sprite;
-	// 				if (sprite->tName == TEX_LEFT) {
-	// 					eventManager->Post(new Event(KEYDOWN, "LEFT"));
-	// 				}
-	// 				if (sprite->tName == TEX_RIGHT) {
-	// 					eventManager->Post(new Event(KEYDOWN, "RIGHT"));
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+	if (event->type == MOUSE_BUTT) {
 		for (auto entity : entMan->entities) {
-			if (entity->sprite && entity->spawner) {
-				SpriteComponent* sprite = (SpriteComponent*)entity->sprite;
-				if (sprite->tName == TEX_BRANCH) {
-					SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
-					// for (int i = 0; i < 5; ++i) {
-					// 	spawner->flip_flags[i] = spawner->flip_flags[i + 1];
-					// }
-					// spawner->flip_flags[5] = getRandom(0, 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+			if (entity->clickable && entity->clickListener) {
+				ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
+				ClickListenerComponent* clc = (ClickListenerComponent*)entity->clickListener;
+				clickable->isClicked = false;
+				if (clc->entity->sprite) {
+					SpriteComponent* sprite = (SpriteComponent*)clc->entity->sprite;
+					if (sprite->tName == TEX_LEFT) {
+						eventManager->Post(new Event(KEYDOWN, "LEFT"));
+					}
+					if (sprite->tName == TEX_RIGHT) {
+						eventManager->Post(new Event(KEYDOWN, "RIGHT"));
+					}
 				}
+				break;
 			}
 		}
+		return;
+	}
+	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		for (auto entity : entMan->entities) {
+			if (entity->spawner) {
+				SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
+				if (spawner->spawner_entities[0].second) {
+					SpriteComponent* sprite = (SpriteComponent*)spawner->spawner_entities[0].second->sprite;
+					if (!strcmp(event->data, "LEFT") && sprite->flip_flag == SDL_FLIP_HORIZONTAL)
+						eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE"));
+					else if (!strcmp(event->data, "RIGHT") && sprite->flip_flag == SDL_FLIP_NONE)
+						eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE"));
+					else
+						eventManager->Post(new Event(SPAWN_BRANCH, " "));
+				} else {
+					eventManager->Post(new Event(SPAWN_BRANCH, " "));
+				}
+				break;
+			}
+		}
+		return;
 	}
 }
 
@@ -82,6 +89,7 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	Entity* ent2 = new Entity;
 	std::vector<SDL_RendererFlip> flip_flags;
 	SpawnerComponent* spawner = new SpawnerComponent;
+	// trunk
 	for (int i = 1; i <= MAX_SPAWNER_COMPONENTS; i++) {
 		Entity* spawner_entity1 = new Entity;
 		spawner_entity1->position = new PositionComponent((WIN_X - 50) / 2, WIN_Y - 265 - Renderer::GetTexture(TEX_TRUNK)->h / MAX_SPAWNER_COMPONENTS * i);
@@ -91,6 +99,7 @@ void GameScene::populateEntity(EntityManager* entMan) {
 
 		spawner->spawner_entities.push_back(std::make_pair(spawner_entity1, nullptr));
 	}
+	// branch
 	for (int i = 0; i < MAX_SPAWNER_COMPONENTS; i++) {
 		if (i % 2 != 0) {
 			Entity* spawner_entity2 = new Entity;
@@ -106,6 +115,9 @@ void GameScene::populateEntity(EntityManager* entMan) {
 		}
 	}
 	ent2->spawner = spawner;
+	SpawnerListenerComponent* slc = new SpawnerListenerComponent(ent2);
+	ent2->spawnerListener = slc;
+	eventManager->AddListener(slc);
 	entMan->entities.push_back(ent2);
 
 	// the stone
@@ -120,6 +132,7 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	ent5->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
 	ent5->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
 	ent5->size = new SizeComponent(70, 107);
+	ent5->animation = new AnimationComponent();
 	ent5->movable = new MovableComponent();
 	MoveListenerComponent* mcl = new MoveListenerComponent(ent5);
 	ent5->moveListener = mcl;

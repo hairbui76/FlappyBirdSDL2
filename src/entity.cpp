@@ -13,7 +13,9 @@ Entity::Entity() {
 	this->movable = nullptr;
 	this->moveListener = nullptr;
 	this->spawner = nullptr;
+	this->spawnerListener = nullptr;
 	this->cuttable = nullptr;
+	this->animation = nullptr;
 }
 
 Entity::~Entity() {
@@ -28,7 +30,9 @@ Entity::~Entity() {
 	delete movable;
 	delete moveListener;
 	delete spawner;
+	delete spawnerListener;
 	delete cuttable;
+	delete animation;
 }
 
 EntityManager::~EntityManager() {

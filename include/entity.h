@@ -15,7 +15,9 @@ struct Entity {
 	Component* movable;
 	Component* moveListener;
 	Component* spawner;
+	Component* spawnerListener;
 	Component* cuttable;
+	Component* animation;
 
 	Entity();
 	~Entity();
