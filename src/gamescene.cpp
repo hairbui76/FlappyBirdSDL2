@@ -15,6 +15,10 @@ GameScene::GameScene(EventManager* eventManager) {
 	populateEntity(entMan);
 }
 
+GameScene::~GameScene() {
+	delete entMan;
+}
+
 void GameScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {
 		// background (layer 0)
@@ -24,7 +28,7 @@ void GameScene::DoFrame(Renderer* renderer) {
 		// stone (layer 3)
 		renderSpriteSystem(entity, renderer, 3);
 		// lumberjack (layer 3)
-		animationSystem(entity, renderer, 3);
+		animationSystem(entity, renderer, eventManager, 3);
 	}
 
 	// for (auto entity : entMan->entities) {
@@ -55,24 +59,47 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 		return;
 	}
 	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		bool dead_state = false;
 		for (auto entity : entMan->entities) {
 			if (entity->spawner) {
 				SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
 				if (spawner->spawner_entities[0].second) {
 					SpriteComponent* sprite = (SpriteComponent*)spawner->spawner_entities[0].second->sprite;
-					if (!strcmp(event->data, "LEFT") && sprite->flip_flag == SDL_FLIP_HORIZONTAL)
-						eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE"));
-					else if (!strcmp(event->data, "RIGHT") && sprite->flip_flag == SDL_FLIP_NONE)
-						eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE"));
-					else
-						eventManager->Post(new Event(SPAWN_BRANCH, " "));
+					if (!strcmp(event->data, "LEFT") && (sprite->flip_flag == SDL_FLIP_HORIZONTAL)) {
+						dead_state = true;
+					} else if (!strcmp(event->data, "RIGHT") && (sprite->flip_flag == SDL_FLIP_NONE)) {
+						dead_state = true;
+					} else
+						eventManager->Post(new Event(SPAWN_BRANCH, ""));
+				} else if (spawner->spawner_entities[1].second) {
+					SpriteComponent* sprite = (SpriteComponent*)spawner->spawner_entities[1].second->sprite;
+					if (!strcmp(event->data, "LEFT") && (sprite->flip_flag == SDL_FLIP_HORIZONTAL)) {
+						dead_state = true;
+					} else if (!strcmp(event->data, "RIGHT") && (sprite->flip_flag == SDL_FLIP_NONE)) {
+						dead_state = true;
+					}
+					eventManager->Post(new Event(SPAWN_BRANCH, ""));
 				} else {
-					eventManager->Post(new Event(SPAWN_BRANCH, " "));
+					eventManager->Post(new Event(SPAWN_BRANCH, ""));
 				}
 				break;
 			}
 		}
+		if (dead_state) {
+			// find dead component lumberjack
+			for (auto entity : entMan->entities) {
+				if (entity->dead) {
+					DeadComponent* dead = (DeadComponent*)entity->dead;
+					dead->is_dead = true;
+					break;
+				}
+			}
+		}
 		return;
+	}
+	if (event->type == GAME_OVER) {
+		SDL_Delay(500);
+		eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE"));
 	}
 }
 
@@ -131,6 +158,13 @@ void GameScene::populateEntity(EntityManager* entMan) {
 
 	// lumberjack
 	Entity* ent5 = new Entity;
+	ent5->dead = new DeadComponent();
+	// handle moving event
+	ent5->movable = new MovableComponent();
+	MoveListenerComponent* mcl = new MoveListenerComponent(ent5);
+	ent5->moveListener = mcl;
+	eventManager->AddListener(mcl);
+	// handle animation
 	AnimationComponent* animation = new AnimationComponent();
 	// lumberjack holding axe
 	Entity* animation_entity1 = new Entity;
@@ -146,11 +180,10 @@ void GameScene::populateEntity(EntityManager* entMan) {
 	animation->animation_entities.push_back(animation_entity2);
 
 	ent5->animation = animation;
-	// handle moving event
-	ent5->movable = new MovableComponent();
-	MoveListenerComponent* mcl = new MoveListenerComponent(ent5);
-	ent5->moveListener = mcl;
-	eventManager->AddListener(mcl);
+	// handle animation event
+	AnimationListenerComponent* alc = new AnimationListenerComponent(ent5);
+	ent5->animationListener = alc;
+	eventManager->AddListener(alc);
 	entMan->entities.push_back(ent5);
 
 	// left button

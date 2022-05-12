@@ -1,5 +1,6 @@
 #include "entity.h"
 #include "component.h"
+#include <iostream>
 
 Entity::Entity() {
 	this->position = nullptr;
@@ -16,6 +17,9 @@ Entity::Entity() {
 	this->spawnerListener = nullptr;
 	this->cuttable = nullptr;
 	this->animation = nullptr;
+	this->animationListener = nullptr;
+	this->dead = nullptr;
+	this->deadListener = nullptr;
 }
 
 Entity::~Entity() {
@@ -33,11 +37,14 @@ Entity::~Entity() {
 	delete spawnerListener;
 	delete cuttable;
 	delete animation;
+	delete animationListener;
+	delete dead;
+	delete deadListener;
 }
 
-EntityManager::~EntityManager() {
-	for (auto entity : entities) {
-		delete entity;
-	}
-	entities.clear();
-}
+// EntityManager::~EntityManager() {
+// 	for (auto entity : entities) {
+// 		delete entity;
+// 	}
+// 	entities.clear();
+// }

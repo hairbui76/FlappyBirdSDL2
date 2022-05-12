@@ -56,12 +56,26 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 	}
 }
 
-void animationSystem(Entity* entity, Renderer* renderer, int layer) {
+void animationSystem(Entity* entity, Renderer* renderer, EventManager* eventManager, int layer) {
 	if (entity->animation) {
 		AnimationComponent* animation = (AnimationComponent*)entity->animation;
 		if (animation->animation_entities.size() > 0) {
-			Entity* entity = animation->animation_entities[animation->current_frame];
-			renderSpriteSystem(entity, renderer, layer);
+			Entity* animation_entity = animation->animation_entities[animation->current_frame];
+			SDL_Delay(60);
+			renderSpriteSystem(animation_entity, renderer, layer);
+			// check for game over state => update animation system to wait for game over change scene
+			if (entity->dead) {
+				DeadComponent* dead = (DeadComponent*)entity->dead;
+				// check if already dead but not finished rendering
+				if (dead->is_dead && !dead->is_over && animation->current_frame == animation->animation_entities.size() - 1) {
+					dead->is_over = true;
+					// check if already dead and finished rendering => post event to change scene
+				} else if (dead->is_dead && dead->is_over && animation->current_frame == 0) {
+					eventManager->Post(new Event(GAME_OVER, ""));
+				}
+			}
+			if (animation->current_frame == animation->animation_entities.size() - 1)
+				animation->current_frame = 0;
 		}
 	}
 }
@@ -80,31 +94,13 @@ void spawnerSystem(Entity* entity, Renderer* renderer, int layer) {
 	}
 }
 
-void moveEntitySystem(Entity* entity) {
-	if (entity->movable) {
-		MovableComponent* movable = (MovableComponent*)entity->movable;
-		if (movable->state == LEFT) {
-			if (entity->animation) {
-				AnimationComponent* animation = (AnimationComponent*)entity->animation;
-				Entity* animation_entity1 = animation->animation_entities[animation->current_frame];
-				animation_entity1->position = new PositionComponent();
-				animation->current_frame++;
-			}
-		}
-	}
-}
-
 void HudSystem(Entity* entity, Renderer* renderer) {
-	try {
-		if (entity->score) {
-			PositionComponent* pos = (PositionComponent*)entity->position;
-			ScoreComponent* scr = (ScoreComponent*)entity->score;
+	if (entity->score) {
+		PositionComponent* pos = (PositionComponent*)entity->position;
+		ScoreComponent* scr = (ScoreComponent*)entity->score;
 
-			char buff[10];
-			sprintf(buff, "%d / %d", scr->score, scr->maxScore);
-			renderer->Print(pos->x, pos->y, buff);
-		}
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+		char buff[10];
+		sprintf(buff, "%d / %d", scr->score, scr->maxScore);
+		renderer->Print(pos->x, pos->y, buff);
 	}
 }

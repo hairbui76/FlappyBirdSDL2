@@ -21,7 +21,7 @@ class SceneManager : public EventListener {
 	EventManager* eventManager;
 
 public:
-	virtual ~SceneManager();
+	~SceneManager();
 	SceneManager(Renderer* renderer, EventManager* eventManager);
 
 	void DoFrame();

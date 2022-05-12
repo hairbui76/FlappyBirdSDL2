@@ -18,6 +18,9 @@ struct Entity {
 	Component* spawnerListener;
 	Component* cuttable;
 	Component* animation;
+	Component* animationListener;
+	Component* dead;
+	Component* deadListener;
 
 	Entity();
 	~Entity();
@@ -25,7 +28,7 @@ struct Entity {
 
 struct EntityManager {
 	EntityManager() = default;
-	~EntityManager();
+	~EntityManager() = default;
 
 	std::vector<Entity*> entities;
 };

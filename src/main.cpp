@@ -8,6 +8,6 @@ int main(int argc, char** argv) {
 	// run app
 	App* app = new App;
 	app->Run();
-	delete (app);
+	delete app;
 	return 0;
 }

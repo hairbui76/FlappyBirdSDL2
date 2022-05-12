@@ -5,6 +5,8 @@
 struct Entity;
 
 struct Component {
+	~Component() = default;
+
 	component_tag_e tag;
 };
 
@@ -100,5 +102,19 @@ struct AnimationComponent : Component {
 	AnimationComponent();
 
 	std::vector<Entity*> animation_entities;
-	int current_frame;
+	size_t current_frame;
+};
+
+struct AnimationListenerComponent : Component, EventListener {
+	AnimationListenerComponent(Entity* entity);
+
+	void Responder(Event* event);
+	Entity* entity = nullptr;
+};
+
+struct DeadComponent : Component {
+	DeadComponent();
+
+	bool is_dead;
+	bool is_over;
 };

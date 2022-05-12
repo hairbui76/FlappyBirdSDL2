@@ -48,6 +48,8 @@
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
 		"queue": "cpp",
-		"map": "cpp"
+		"map": "cpp",
+		"chrono": "cpp",
+		"ratio": "cpp"
 	}
 }

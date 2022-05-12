@@ -164,3 +164,54 @@ AnimationComponent::AnimationComponent() {
 	this->tag = ANIMATION;
 	this->current_frame = 0;
 }
+
+AnimationListenerComponent::AnimationListenerComponent(Entity* entity) {
+	this->tag = ANIMATIONLISTENER;
+	this->entity = entity;
+}
+
+void AnimationListenerComponent::Responder(Event* event) {
+	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		if (entity->dead) {
+			DeadComponent* dead = (DeadComponent*)entity->dead;
+			if (entity->movable) {
+				MovableComponent* movable = (MovableComponent*)entity->movable;
+				if (entity->animation) {
+					AnimationComponent* animation = (AnimationComponent*)entity->animation;
+					Entity* animation_entity1 = animation->animation_entities[0];
+					animation_entity1->size = new SizeComponent(70, 107);
+					if (movable->state == LEFT) {
+						animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 90, WIN_Y - 350);
+						animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3, SDL_FLIP_HORIZONTAL);
+						Entity* animation_entity2 = animation->animation_entities[1];
+						animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 - 70, WIN_Y - 350);
+						animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3, SDL_FLIP_HORIZONTAL);
+					} else if (movable->state == RIGHT) {
+						animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
+						animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
+						Entity* animation_entity2 = animation->animation_entities[1];
+						animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 + 28, WIN_Y - 350);
+						animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3);
+					}
+					if (dead->is_dead) {
+						animation_entity1->size = new SizeComponent(70, 85);
+						if (movable->state == LEFT) {
+							animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 80, WIN_Y - 340);
+							animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3, SDL_FLIP_HORIZONTAL);
+						} else if (movable->state == RIGHT) {
+							animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 340);
+							animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3);
+						}
+					}
+					animation->current_frame++;
+				}
+			}
+		}
+	}
+}
+
+DeadComponent::DeadComponent() {
+	this->tag = DEAD;
+	this->is_dead = false;
+	this->is_over = false;
+}

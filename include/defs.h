@@ -32,7 +32,10 @@ enum component_tag_e {
 	SPAWNER,
 	SPAWNERLISTENER,
 	CUTTABLE,
-	ANIMATION
+	ANIMATION,
+	ANIMATIONLISTENER,
+	DEAD,
+	DEADLISTENER,
 };
 
 enum texture_e {
@@ -66,6 +69,7 @@ enum event_type_e {
 	INC_SCORE,
 	MOUSE_BUTT,
 	SPAWN_BRANCH,
+	GAME_OVER,
 };
 
 int getRandom(int a, int b);

@@ -27,7 +27,7 @@ void EventManager::PumpEvents() {
 		eventQueue.pop();
 		for (auto listener : listeners)
 			listener->Responder(event);
-		delete (event);
+		delete event;
 	}
 }
 
