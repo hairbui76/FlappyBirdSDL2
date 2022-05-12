@@ -28,7 +28,7 @@ struct Entity {
 
 struct EntityManager {
 	EntityManager() = default;
-	~EntityManager() = default;
+	~EntityManager();
 
 	std::vector<Entity*> entities;
 };

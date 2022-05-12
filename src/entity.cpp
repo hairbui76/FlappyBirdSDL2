@@ -42,9 +42,9 @@ Entity::~Entity() {
 	delete deadListener;
 }
 
-// EntityManager::~EntityManager() {
-// 	for (auto entity : entities) {
-// 		delete entity;
-// 	}
-// 	entities.clear();
-// }
+EntityManager::~EntityManager() {
+	for (auto entity : entities) {
+		delete entity;
+	}
+	entities.clear();
+}

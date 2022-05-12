@@ -57,9 +57,9 @@ TitleScene::TitleScene(EventManager* eventManager) {
 	entMan->entities.push_back(ent7);
 }
 
-// TitleScene::~TitleScene() {
-// 	delete entMan;
-// }
+TitleScene::~TitleScene() {
+	delete entMan;
+}
 
 void TitleScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {

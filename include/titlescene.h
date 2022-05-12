@@ -4,7 +4,7 @@
 
 struct TitleScene : Scene {
 	TitleScene(EventManager* eventManager);
-	~TitleScene() = default;
+	~TitleScene();
 
 	void DoFrame(Renderer* renderer);
 	void Responder(Event* event, EventManager* eventManager);
