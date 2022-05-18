@@ -55,6 +55,17 @@ void EndScene::populateEntity(EntityManager* entMan, move_tag_e move_state) {
 	}
 	ent4->size = new SizeComponent(70, 85);
 	entMan->entities.push_back(ent4);
+
+	// refresh button
+	Entity* ent5 = new Entity;
+	ent5->position = new PositionComponent((WIN_X - 120) / 2, WIN_Y - 160);
+	ent5->sprite = new SpriteComponent(TEX_REFRESH, 1.0, 0);
+	ent5->size = new SizeComponent(120, 120);
+	ent5->clickable = new ClickableComponent();
+	ClickListenerComponent* clc = new ClickListenerComponent(ent5, eventManager);
+	eventManager->AddListener(clc);
+	ent5->clickListener = clc;
+	entMan->entities.push_back(ent5);
 }
 
 void EndScene::Responder(Event* event, EventManager* eventManager) {

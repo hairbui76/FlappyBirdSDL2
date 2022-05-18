@@ -56,26 +56,32 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 	}
 }
 
-void animationSystem(Entity* entity, Renderer* renderer, EventManager* eventManager, int layer) {
-	if (entity->animation) {
-		AnimationComponent* animation = (AnimationComponent*)entity->animation;
-		if (animation->animation_entities.size() > 0) {
-			Entity* animation_entity = animation->animation_entities[animation->current_frame];
+void handAnimationSystem(Entity* entity, Renderer* renderer, EventManager* eventManager, int layer) {
+	if (entity->handAnimation) {
+		HandAnimationComponent* handAnimation = (HandAnimationComponent*)entity->handAnimation;
+		if (handAnimation->hand_animation_entities.size() > 0) {
+			Entity* hand_animation_entity = handAnimation->hand_animation_entities[handAnimation->current_frame];
 			SDL_Delay(60);
-			renderSpriteSystem(animation_entity, renderer, layer);
+			renderSpriteSystem(hand_animation_entity, renderer, layer);
 			// check for game over state => update animation system to wait for game over change scene
 			if (entity->dead) {
 				DeadComponent* dead = (DeadComponent*)entity->dead;
 				// check if already dead but not finished rendering
-				if (dead->is_dead && !dead->is_over && animation->current_frame == animation->animation_entities.size() - 1) {
+				if (dead->is_dead && !dead->is_over && handAnimation->current_frame == handAnimation->hand_animation_entities.size() - 1) {
 					dead->is_over = true;
 					// check if already dead and finished rendering => post event to change scene
-				} else if (dead->is_dead && dead->is_over && animation->current_frame == 0) {
-					eventManager->Post(new Event(GAME_OVER, ""));
+				} else if (dead->is_dead && dead->is_over && handAnimation->current_frame == 0) {
+					if (entity->movable) {
+						MovableComponent* movable = (MovableComponent*)entity->movable;
+						if (movable->state == LEFT)
+							eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE_LEFT"));
+						else
+							eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE_RIGHT"));
+					}
 				}
 			}
-			if (animation->current_frame == animation->animation_entities.size() - 1)
-				animation->current_frame = 0;
+			if (handAnimation->current_frame == handAnimation->hand_animation_entities.size() - 1)
+				handAnimation->current_frame = 0;
 		}
 	}
 }
@@ -94,13 +100,34 @@ void spawnerSystem(Entity* entity, Renderer* renderer, int layer) {
 	}
 }
 
+void timelineTickSystem(Entity* entity, Renderer* renderer, EventManager* eventManager) {
+	if (entity->shrinkable) {
+		ShrinkableComponent* shrinkable = (ShrinkableComponent*)entity->shrinkable;
+		if (shrinkable->started) {
+			if (entity->sprite) {
+				SpriteComponent* spr = (SpriteComponent*)entity->sprite;
+				if (entity->cuttable) {
+					CuttableComponent* cuttable = (CuttableComponent*)entity->cuttable;
+					cuttable->cut_width -= shrinkable->value;
+					if (cuttable->cut_width < 0) cuttable->cut_width = 0;
+				}
+				if (entity->size) {
+					SizeComponent* size = (SizeComponent*)entity->size;
+					size->w -= shrinkable->value;
+					if (size->w < 25)
+						spr->tName = TEX_TIMELINE_WARN;
+					else
+						spr->tName = TEX_TIMELINE_BAR;
+					if (size->w < 0) eventManager->Post(new Event(GAME_OVER, ""));
+				}
+			}
+		}
+	}
+}
+
 void HudSystem(Entity* entity, Renderer* renderer) {
 	if (entity->score) {
-		PositionComponent* pos = (PositionComponent*)entity->position;
 		ScoreComponent* scr = (ScoreComponent*)entity->score;
-
-		char buff[10];
-		sprintf(buff, "%d / %d", scr->score, scr->maxScore);
-		renderer->Print(pos->x, pos->y, buff);
+		renderer->Print(std::to_string(scr->score).c_str());
 	}
 }

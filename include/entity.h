@@ -17,10 +17,13 @@ struct Entity {
 	Component* spawner;
 	Component* spawnerListener;
 	Component* cuttable;
-	Component* animation;
-	Component* animationListener;
+	Component* handAnimation;
+	Component* handAnimationListener;
 	Component* dead;
 	Component* deadListener;
+	Component* shrinkable;
+	Component* shrinkListener;
+	Component* autoAnimation;
 
 	Entity();
 	~Entity();

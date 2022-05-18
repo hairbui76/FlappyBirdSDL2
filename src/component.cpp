@@ -34,14 +34,17 @@ SizeComponent::SizeComponent(double w, double h) {
 	this->h = h;
 }
 
-ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr) {
+ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr, EventManager* eventManager) {
 	this->tag = SCORELISTENER;
 	this->scr = scr;
+	this->eventManager = eventManager;
 }
 
 void ScoreListenerComponent::Responder(Event* event) {
 	if (event->type == INC_SCORE) {
 		this->scr->score += 1;
+		if (this->scr->score % 20 == 0 && this->scr->score != 0)
+			eventManager->Post(new Event(LEVEL_UP, ""));
 	}
 }
 
@@ -50,9 +53,10 @@ ClickableComponent::ClickableComponent() {
 	this->isClicked = false;
 }
 
-ClickListenerComponent::ClickListenerComponent(Entity* entity) {
+ClickListenerComponent::ClickListenerComponent(Entity* entity, EventManager* eventManager) {
 	this->tag = CLICKLISTENER;
 	this->entity = entity;
+	this->eventManager = eventManager;
 }
 
 void ClickListenerComponent::Responder(Event* event) {
@@ -63,6 +67,7 @@ void ClickListenerComponent::Responder(Event* event) {
 			ClickableComponent* clickable = (ClickableComponent*)entity->clickable;
 			if (event->x >= position->x && event->x <= position->x + size->w && event->y >= position->y && event->y <= position->y + size->h) {
 				clickable->isClicked = true;
+				eventManager->Post(new Event(BUTT_CLICK, ""));
 			}
 		}
 	}
@@ -160,50 +165,54 @@ CuttableComponent::CuttableComponent(int origin_x, int origin_y, int cut_width, 
 	this->cut_height = cut_height;
 };
 
-AnimationComponent::AnimationComponent() {
-	this->tag = ANIMATION;
+HandAnimationComponent::HandAnimationComponent() {
+	this->tag = HANDANIMATION;
 	this->current_frame = 0;
 }
 
-AnimationListenerComponent::AnimationListenerComponent(Entity* entity) {
-	this->tag = ANIMATIONLISTENER;
+HandAnimationListenerComponent::HandAnimationListenerComponent(Entity* entity) {
+	this->tag = HANDANIMATIONLISTENER;
 	this->entity = entity;
 }
 
-void AnimationListenerComponent::Responder(Event* event) {
-	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+void HandAnimationListenerComponent::Responder(Event* event) {
+	if ((event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) || event->type == GAME_OVER) {
 		if (entity->dead) {
 			DeadComponent* dead = (DeadComponent*)entity->dead;
 			if (entity->movable) {
 				MovableComponent* movable = (MovableComponent*)entity->movable;
-				if (entity->animation) {
-					AnimationComponent* animation = (AnimationComponent*)entity->animation;
-					Entity* animation_entity1 = animation->animation_entities[0];
-					animation_entity1->size = new SizeComponent(70, 107);
+				if (entity->handAnimation) {
+					HandAnimationComponent* handAnimation = (HandAnimationComponent*)entity->handAnimation;
+					Entity* hand_animation_entity1 = handAnimation->hand_animation_entities[0];
+					hand_animation_entity1->size = new SizeComponent(70, 107);
 					if (movable->state == LEFT) {
-						animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 90, WIN_Y - 350);
-						animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3, SDL_FLIP_HORIZONTAL);
-						Entity* animation_entity2 = animation->animation_entities[1];
-						animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 - 70, WIN_Y - 350);
-						animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3, SDL_FLIP_HORIZONTAL);
+						hand_animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 90, WIN_Y - 350);
+						hand_animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3, SDL_FLIP_HORIZONTAL);
+						Entity* hand_animation_entity2 = handAnimation->hand_animation_entities[1];
+						hand_animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 - 70, WIN_Y - 350);
+						hand_animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3, SDL_FLIP_HORIZONTAL);
 					} else if (movable->state == RIGHT) {
-						animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
-						animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
-						Entity* animation_entity2 = animation->animation_entities[1];
-						animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 + 28, WIN_Y - 350);
-						animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3);
+						hand_animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 65, WIN_Y - 350);
+						hand_animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_HOLDING, 1.0, 3);
+						Entity* hand_animation_entity2 = handAnimation->hand_animation_entities[1];
+						hand_animation_entity2->position = new PositionComponent((WIN_X - 50) / 2 + 28, WIN_Y - 350);
+						hand_animation_entity2->sprite = new SpriteComponent(TEX_LUMBER_CUTTING, 1.0, 3);
 					}
 					if (dead->is_dead) {
-						animation_entity1->size = new SizeComponent(70, 85);
+						hand_animation_entity1->size = new SizeComponent(70, 85);
 						if (movable->state == LEFT) {
-							animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 80, WIN_Y - 340);
-							animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3, SDL_FLIP_HORIZONTAL);
+							hand_animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 - 80, WIN_Y - 340);
+							hand_animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3, SDL_FLIP_HORIZONTAL);
 						} else if (movable->state == RIGHT) {
-							animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 340);
-							animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3);
+							hand_animation_entity1->position = new PositionComponent((WIN_X - 50) / 2 + 60, WIN_Y - 340);
+							hand_animation_entity1->sprite = new SpriteComponent(TEX_LUMBER_DEAD, 1.0, 3);
+						}
+						if (event->type == GAME_OVER) {
+							dead->is_over = true;
+							return;
 						}
 					}
-					animation->current_frame++;
+					handAnimation->current_frame++;
 				}
 			}
 		}
@@ -214,4 +223,31 @@ DeadComponent::DeadComponent() {
 	this->tag = DEAD;
 	this->is_dead = false;
 	this->is_over = false;
+}
+
+ShrinkableComponent::ShrinkableComponent() {
+	this->tag = SHRINKABLE;
+	this->value = 1;
+	this->started = false;
+}
+
+ShrinkListenerComponent::ShrinkListenerComponent(ShrinkableComponent* shrinkable) {
+	this->tag = SHRINKLISTENER;
+	this->shrinkable = shrinkable;
+}
+
+void ShrinkListenerComponent::Responder(Event* event) {
+	if (event->type == LEVEL_UP) {
+		shrinkable->value += 0.5;
+	}
+	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
+		if (!shrinkable->started) {
+			shrinkable->started = true;
+		}
+	}
+};
+
+AutoAnimationComponent::AutoAnimationComponent(Entity* entity) {
+	this->tag = AUTOANIMATION;
+	this->entity = entity;
 }

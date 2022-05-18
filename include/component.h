@@ -5,6 +5,7 @@
 struct Entity;
 
 struct Component {
+	Component() = default;
 	~Component() = default;
 
 	component_tag_e tag;
@@ -47,10 +48,11 @@ struct ScoreComponent : Component {
 };
 
 struct ScoreListenerComponent : Component, EventListener {
-	ScoreListenerComponent(ScoreComponent* scr);
+	ScoreListenerComponent(ScoreComponent* scr, EventManager* eventManager);
 
 	void Responder(Event* event);
 	ScoreComponent* scr = nullptr;
+	EventManager* eventManager = nullptr;
 };
 
 struct ClickableComponent : Component {
@@ -60,10 +62,11 @@ struct ClickableComponent : Component {
 };
 
 struct ClickListenerComponent : Component, EventListener {
-	ClickListenerComponent(Entity* entity);
+	ClickListenerComponent(Entity* entity, EventManager* eventManager);
 
 	void Responder(Event* event);
 	Entity* entity = nullptr;
+	EventManager* eventManager = nullptr;
 };
 
 struct MovableComponent : Component {
@@ -98,15 +101,15 @@ struct CuttableComponent : Component {
 	int origin_x, origin_y, cut_width, cut_height;
 };
 
-struct AnimationComponent : Component {
-	AnimationComponent();
+struct HandAnimationComponent : Component {
+	HandAnimationComponent();
 
-	std::vector<Entity*> animation_entities;
+	std::vector<Entity*> hand_animation_entities;
 	size_t current_frame;
 };
 
-struct AnimationListenerComponent : Component, EventListener {
-	AnimationListenerComponent(Entity* entity);
+struct HandAnimationListenerComponent : Component, EventListener {
+	HandAnimationListenerComponent(Entity* entity);
 
 	void Responder(Event* event);
 	Entity* entity = nullptr;
@@ -117,4 +120,24 @@ struct DeadComponent : Component {
 
 	bool is_dead;
 	bool is_over;
+};
+
+struct ShrinkableComponent : Component {
+	ShrinkableComponent();
+
+	double value;
+	bool started;
+};
+
+struct ShrinkListenerComponent : Component, EventListener {
+	ShrinkListenerComponent(ShrinkableComponent* shrinkable);
+
+	void Responder(Event* event);
+	ShrinkableComponent* shrinkable = nullptr;
+};
+
+struct AutoAnimationComponent : Component {
+	AutoAnimationComponent(Entity* entity);
+
+	Entity* entity = nullptr;
 };

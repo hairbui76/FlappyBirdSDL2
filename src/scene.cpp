@@ -26,8 +26,13 @@ void SceneManager::Responder(Event* event) {
 			if (!strcmp(event->data, "GAME_SCENE")) {
 				ChangeScene(GAME);
 			}
-			if (!strcmp(event->data, "END_SCENE")) {
-				ChangeScene(END);
+			if (!strcmp(event->data, "END_SCENE_LEFT")) {
+				SDL_Delay(500);
+				ChangeScene(END, LEFT);
+			}
+			if (!strcmp(event->data, "END_SCENE_RIGHT")) {
+				SDL_Delay(500);
+				ChangeScene(END, RIGHT);
 			}
 			break;
 		}

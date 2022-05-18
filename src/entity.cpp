@@ -16,10 +16,13 @@ Entity::Entity() {
 	this->spawner = nullptr;
 	this->spawnerListener = nullptr;
 	this->cuttable = nullptr;
-	this->animation = nullptr;
-	this->animationListener = nullptr;
+	this->handAnimation = nullptr;
+	this->handAnimationListener = nullptr;
 	this->dead = nullptr;
 	this->deadListener = nullptr;
+	this->shrinkable = nullptr;
+	this->shrinkListener = nullptr;
+	this->autoAnimation = nullptr;
 }
 
 Entity::~Entity() {
@@ -36,10 +39,13 @@ Entity::~Entity() {
 	delete spawner;
 	delete spawnerListener;
 	delete cuttable;
-	delete animation;
-	delete animationListener;
+	delete handAnimation;
+	delete handAnimationListener;
 	delete dead;
 	delete deadListener;
+	delete shrinkable;
+	delete shrinkListener;
+	delete autoAnimation;
 }
 
 EntityManager::~EntityManager() {

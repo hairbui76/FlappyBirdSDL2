@@ -19,13 +19,19 @@ static Texture* tex_lumber_holding;
 static Texture* tex_lumber_cutting;
 static Texture* tex_lumber_dead;
 
+static Texture* tex_timeline;
+static Texture* tex_timeline_bar;
+static Texture* tex_timeline_warn;
+
 static Texture* tex_text_title;
 
 static TTF_Font* font;
-static SDL_Color red;
-static SDL_Color white;
-static SDL_Color black;
-static SDL_Color yellow;
+static TTF_Font* title_font;
+
+static SDL_Color red{155, 50, 50, 255};
+static SDL_Color white{255, 255, 255, 255};
+static SDL_Color grey{77, 77, 77, 255};
+static SDL_Color yellow{255, 0, 211, 255};
 
 static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mode = false, const char* text = "");
 
@@ -50,24 +56,10 @@ Renderer::Renderer() {
 	SDL_RenderSetLogicalSize(renderer, WIN_X, WIN_Y);
 	target = nullptr;
 
-	font = TTF_OpenFont("assets/charter-sc-itc-tt.ttf", 80);
+	title_font = TTF_OpenFont("assets/Charter Bold.ttf", 60);
+	if (!title_font) logSDLError("Unable to load font: %s", TTF_GetError());
+	font = TTF_OpenFont("assets/Charter Bold.ttf", 30);
 	if (!font) logSDLError("Unable to load font: %s", TTF_GetError());
-	red.r = 155;
-	red.g = 50;
-	red.b = 50;
-	red.a = 255;
-	white.r = 255;
-	white.g = 255;
-	white.b = 255;
-	white.a = 255;
-	black.r = 0;
-	black.b = 0;
-	black.g = 0;
-	black.a = 255;
-	yellow.r = 255;
-	yellow.b = 0;
-	yellow.g = 211;
-	yellow.a = 255;
 
 	// resources background
 	tex_bg = LoadTex(renderer, "assets/bg.bmp");
@@ -96,6 +88,13 @@ Renderer::Renderer() {
 	if (!tex_lumber_cutting) logSDLError("Unable to load tex_lumber_cutting: %s", SDL_GetError());
 	tex_lumber_dead = LoadTex(renderer, "assets/lumber_dead.bmp");
 	if (!tex_lumber_dead) logSDLError("Unable to load tex_lumber_dead: %s", SDL_GetError());
+	// timeline
+	tex_timeline = LoadTex(renderer, "assets/timeline.bmp");
+	if (!tex_timeline) logSDLError("Unable to load tex_timeline: %s", SDL_GetError());
+	tex_timeline_bar = LoadTex(renderer, "assets/timeline_bar.bmp");
+	if (!tex_timeline_bar) logSDLError("Unable to load tex_timeline_bar: %s", SDL_GetError());
+	tex_timeline_warn = LoadTex(renderer, "assets/timeline_warn.bmp");
+	if (!tex_timeline_warn) logSDLError("Unable to load tex_timeline_warn: %s", SDL_GetError());
 	// title text
 	tex_text_title = LoadTex(renderer, " ", true, "Lumberjack");
 	if (!tex_text_title) logSDLError("Unable to load tex_text_title: %s", TTF_GetError());
@@ -114,6 +113,9 @@ Renderer::~Renderer() {
 	SDL_DestroyTexture(tex_lumber_holding->tex);
 	SDL_DestroyTexture(tex_lumber_cutting->tex);
 	SDL_DestroyTexture(tex_lumber_dead->tex);
+	SDL_DestroyTexture(tex_timeline->tex);
+	SDL_DestroyTexture(tex_timeline_bar->tex);
+	SDL_DestroyTexture(tex_timeline_warn->tex);
 	SDL_DestroyTexture(tex_text_title->tex);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -130,18 +132,18 @@ void Renderer::renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, Textu
 	}
 }
 
-void Renderer::Print(int x, int y, char const* text) {
-	SDL_Rect r{x, y, 0, 0};
+void Renderer::Print(char const* text) {
+	SDL_Rect r{0, 0, 0, 0};
 	TTF_SizeText(font, text, &r.w, &r.h);
-	SDL_Surface* surf = TTF_RenderText_Solid(font, text, red);
+	SDL_Surface* surf = TTF_RenderText_Solid(font, text, white);
+	if (!surf) logSDLError("Unable to render text: %s", TTF_GetError());
+	r.x = (WIN_X - r.w) / 2;
+	r.y = 20.0;
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+	if (!tex) logSDLError("Unable to create texture: %s", SDL_GetError());
 	SDL_RenderCopyEx(renderer, tex, NULL, &r, 0.0, NULL, SDL_FLIP_NONE);
 	SDL_FreeSurface(surf);
 	SDL_DestroyTexture(tex);
-}
-
-void Renderer::DrawLine(int aX, int aY, int bX, int bY) {
-	SDL_RenderDrawLine(renderer, aX, aY, bX, bY);
 }
 
 void Renderer::Clear() {
@@ -202,6 +204,15 @@ Texture* Renderer::GetTexture(texture_e tag) {
 		case TEX_LUMBER_CUTTING:
 			return tex_lumber_cutting;
 
+		case TEX_TIMELINE:
+			return tex_timeline;
+
+		case TEX_TIMELINE_BAR:
+			return tex_timeline_bar;
+
+		case TEX_TIMELINE_WARN:
+			return tex_timeline_warn;
+
 		case TEX_TEXT_TITLE:
 			return tex_text_title;
 
@@ -213,7 +224,7 @@ Texture* Renderer::GetTexture(texture_e tag) {
 static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mode, const char* text) {
 	SDL_Surface* surf;
 	if (text_mode)
-		surf = TTF_RenderText_Blended(font, text, black);
+		surf = TTF_RenderText_Blended(title_font, text, grey);
 	else
 		surf = SDL_LoadBMP(fPath);
 	if (!surf) return nullptr;

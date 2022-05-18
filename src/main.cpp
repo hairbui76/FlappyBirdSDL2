@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
 	(void)argc;
 	(void)argv;
 	// run app
-	App* app = new App;
+	App* app = new App();
 	app->Run();
 	delete app;
 	return 0;

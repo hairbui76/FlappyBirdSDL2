@@ -19,8 +19,7 @@ public:
 	~Renderer();
 
 	void renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, Texture* tex, texture_e tag, bool full = false, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
-	void Print(int x, int y, char const* text);
-	void DrawLine(int aX, int aY, int bX, int bY);
+	void Print(char const* text);
 	void Clear();
 	void Present();
 	static Texture* GetTexture(texture_e tag);

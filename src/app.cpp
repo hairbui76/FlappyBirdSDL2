@@ -6,8 +6,8 @@
 #include <iostream>
 
 App::App() {
-	renderer = new Renderer;
-	eventManager = new EventManager;
+	renderer = new Renderer();
+	eventManager = new EventManager();
 	eventManager->AddListener(this);
 	sceneManager = new SceneManager(renderer, eventManager);
 	eventManager->AddListener(sceneManager);
