@@ -15,12 +15,14 @@ GameScene::GameScene(EventManager* eventManager) {
 	populateEntity(entMan);
 }
 
-GameScene::~GameScene() {
-	delete entMan;
-}
+// GameScene::~GameScene() {
+// 	delete entMan;
+// }
 
 void GameScene::DoFrame(Renderer* renderer) {
 	for (auto entity : entMan->entities) {
+		// collapse tree animation (layer 3)
+		autoAnimationSystem(entity, renderer, 3);
 		// background (layer 0)
 		renderSpriteSystem(entity, renderer, 0);
 		// branch and trunk (layer 1 & 2)
@@ -28,9 +30,9 @@ void GameScene::DoFrame(Renderer* renderer) {
 		// stone (layer 3)
 		renderSpriteSystem(entity, renderer, 3);
 		// lumberjack (layer 3)
-		handAnimationSystem(entity, renderer, eventManager, 3);
+		handAnimationSystem(entity, renderer, eventManager, entMan, 3);
 		// timeline
-		timelineTickSystem(entity, renderer, eventManager);
+		timelineTickSystem(entity, eventManager);
 		// timeline bar (layer 4)
 		renderSpriteSystem(entity, renderer, 4);
 		// timeline (layer 5)
@@ -64,14 +66,21 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 		for (auto entity : entMan->entities) {
 			if (entity->spawner) {
 				SpawnerComponent* spawner = (SpawnerComponent*)entity->spawner;
+				// check if at the 0th position exists a branch
 				if (spawner->spawner_entities[0].second) {
 					SpriteComponent* sprite = (SpriteComponent*)spawner->spawner_entities[0].second->sprite;
 					if (!strcmp(event->data, "LEFT") && (sprite->flip_flag == SDL_FLIP_HORIZONTAL)) {
 						dead_state = true;
 					} else if (!strcmp(event->data, "RIGHT") && (sprite->flip_flag == SDL_FLIP_NONE)) {
 						dead_state = true;
-					} else
+					} else {
+						if (!strcmp(event->data, "LEFT") && sprite->flip_flag == SDL_FLIP_NONE)
+							eventManager->Post(new Event(CUT_TREE, "RIGHT"));
+						else if (!strcmp(event->data, "RIGHT") && sprite->flip_flag == SDL_FLIP_HORIZONTAL)
+							eventManager->Post(new Event(CUT_TREE, "LEFT"));
 						eventManager->Post(new Event(SPAWN_BRANCH, ""));
+					}
+					// check if at the 1st position exists a branch
 				} else if (spawner->spawner_entities[1].second) {
 					SpriteComponent* sprite = (SpriteComponent*)spawner->spawner_entities[1].second->sprite;
 					if (!strcmp(event->data, "LEFT") && (sprite->flip_flag == SDL_FLIP_HORIZONTAL)) {
@@ -79,8 +88,16 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 					} else if (!strcmp(event->data, "RIGHT") && (sprite->flip_flag == SDL_FLIP_NONE)) {
 						dead_state = true;
 					}
+					if (!strcmp(event->data, "LEFT"))
+						eventManager->Post(new Event(CUT_WOOD, "RIGHT"));
+					else if (!strcmp(event->data, "RIGHT"))
+						eventManager->Post(new Event(CUT_WOOD, "LEFT"));
 					eventManager->Post(new Event(SPAWN_BRANCH, ""));
 				} else {
+					if (!strcmp(event->data, "LEFT"))
+						eventManager->Post(new Event(CUT_WOOD, "RIGHT"));
+					else if (!strcmp(event->data, "RIGHT"))
+						eventManager->Post(new Event(CUT_WOOD, "LEFT"));
 					eventManager->Post(new Event(SPAWN_BRANCH, ""));
 				}
 				break;
@@ -102,7 +119,6 @@ void GameScene::Responder(Event* event, EventManager* eventManager) {
 		// find timeline bar
 		for (auto entity : entMan->entities) {
 			if (entity->shrinkable) {
-				ShrinkableComponent* shrinkable = (ShrinkableComponent*)entity->shrinkable;
 				if (entity->size) {
 					SizeComponent* size = (SizeComponent*)entity->size;
 					size->w += 5;
@@ -177,9 +193,13 @@ void GameScene::populateEntity(EntityManager* entMan) {
 
 	// animation when cutting wood
 	Entity* ent3 = new Entity();
-	ent3->position = new PositionComponent((WIN_X - 75) / 2, WIN_Y - 275);
-	ent3->size = new SizeComponent(125, 80);
-	ent3->autoAnimation = new AutoAnimationComponent(ent3);
+	ent3->disappear = new DisappearComponent();
+	ent3->disappearAngle = new DisappearAngleComponent(45);
+	ent3->autoAnimation = new AutoAnimationComponent(3);
+	AutoAnimationListenerComponent* aalc = new AutoAnimationListenerComponent(ent3);
+	eventManager->AddListener(aalc);
+	ent3->autoAnimationListener = aalc;
+	entMan->entities.push_back(ent3);
 
 	// the stone
 	Entity* ent4 = new Entity();

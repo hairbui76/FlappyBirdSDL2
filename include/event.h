@@ -2,13 +2,14 @@
 #include "defs.h"
 
 struct Event {
-	Event(event_type_e type, const char* data, double x = 0, double y = 0);
+	Event(event_type_e type, const char* data, double x = 0, double y = 0, int score = 0);
 	~Event() = default;
 
 	event_type_e type;
 	const char* data;
 	double x;
 	double y;
+	int score;
 };
 
 struct EventListener {

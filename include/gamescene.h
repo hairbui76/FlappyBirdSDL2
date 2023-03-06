@@ -10,8 +10,8 @@ class GameScene : public Scene {
 	int maxScore;
 
 public:
-	~GameScene();
 	GameScene(EventManager* eventManager);
+	~GameScene() = default;
 
 	void DoFrame(Renderer* renderer);
 	void Responder(Event* event, EventManager* eventManager);

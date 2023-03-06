@@ -1,11 +1,12 @@
 #include "event.h"
 #include <iostream>
 
-Event::Event(event_type_e type, const char* data, double x, double y) {
+Event::Event(event_type_e type, const char* data, double x, double y, int score) {
 	this->type = type;
 	this->data = data;
 	this->x = x;
 	this->y = y;
+	this->score = score;
 }
 
 EventManager::EventManager() {

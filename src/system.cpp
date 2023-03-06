@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "event.h"
 #include "renderer.h"
+#include <SDL_TTF.h>
 #include <cmath>
 #include <iostream>
 
@@ -22,11 +23,15 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 		double h = tex->h;
 		double scale = spr->scale;
 		double angle = 0.0;
+		double alpha = spr->alpha;
+		SDL_FPoint center{0.0, 0.0};
 		SDL_RendererFlip flip_flag = spr->flip_flag;
 
 		if (entity->angle) {
 			RotateComponent* r = (RotateComponent*)entity->angle;
 			angle = r->angle;
+			center.x = r->origin_x;
+			center.y = r->origin_y;
 		}
 
 		if (entity->size) {
@@ -49,20 +54,21 @@ void renderSpriteSystem(Entity* entity, Renderer* renderer, int layer, bool full
 			CuttableComponent* cuttable = (CuttableComponent*)entity->cuttable;
 			sRect = {cuttable->origin_x, cuttable->origin_y, cuttable->cut_width, cuttable->cut_height};
 			dRect = {(float)x, (float)y, (float)(w * scale), (float)(h * scale)};
-			renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
+			renderer->renderSprite(sRect, dRect, angle, &center, alpha, tex, spr->tName, full, flip_flag);
 			return;
 		}
-		renderer->renderSprite(sRect, dRect, angle, tex, spr->tName, full, flip_flag);
+		renderer->renderSprite(sRect, dRect, angle, &center, alpha, tex, spr->tName, full, flip_flag);
 	}
 }
 
-void handAnimationSystem(Entity* entity, Renderer* renderer, EventManager* eventManager, int layer) {
+void handAnimationSystem(Entity* entity, Renderer* renderer, EventManager* eventManager, EntityManager* entMan, int layer) {
 	if (entity->handAnimation) {
 		HandAnimationComponent* handAnimation = (HandAnimationComponent*)entity->handAnimation;
 		if (handAnimation->hand_animation_entities.size() > 0) {
 			Entity* hand_animation_entity = handAnimation->hand_animation_entities[handAnimation->current_frame];
 			SDL_Delay(60);
 			renderSpriteSystem(hand_animation_entity, renderer, layer);
+			if (handAnimation->current_frame == handAnimation->hand_animation_entities.size() - 1) Renderer::PlaySound(HIT);
 			// check for game over state => update animation system to wait for game over change scene
 			if (entity->dead) {
 				DeadComponent* dead = (DeadComponent*)entity->dead;
@@ -71,17 +77,65 @@ void handAnimationSystem(Entity* entity, Renderer* renderer, EventManager* event
 					dead->is_over = true;
 					// check if already dead and finished rendering => post event to change scene
 				} else if (dead->is_dead && dead->is_over && handAnimation->current_frame == 0) {
+					Renderer::PlaySound(DIE);
 					if (entity->movable) {
 						MovableComponent* movable = (MovableComponent*)entity->movable;
+						int last_score = 0;
+						// find score entity
+						for (auto entity : entMan->entities) {
+							if (entity->score) {
+								ScoreComponent* score = (ScoreComponent*)entity->score;
+								last_score = score->score;
+								break;
+							}
+						}
 						if (movable->state == LEFT)
-							eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE_LEFT"));
+							eventManager->Post(new Event(CHANGE_SCENE, "LEFT", 0.0, 0.0, last_score));
 						else
-							eventManager->Post(new Event(CHANGE_SCENE, "END_SCENE_RIGHT"));
+							eventManager->Post(new Event(CHANGE_SCENE, "RIGHT", 0.0, 0.0, last_score));
 					}
 				}
 			}
 			if (handAnimation->current_frame == handAnimation->hand_animation_entities.size() - 1)
 				handAnimation->current_frame = 0;
+		}
+	}
+}
+
+void autoAnimationSystem(Entity* entity, Renderer* renderer, int layer) {
+	if (entity->autoAnimation) {
+		AutoAnimationComponent* autoAnimation = (AutoAnimationComponent*)entity->autoAnimation;
+		if (autoAnimation->is_started) {
+			if (entity->sprite) {
+				SpriteComponent* sprite = (SpriteComponent*)entity->sprite;
+				if (entity->disappear) {
+					sprite->alpha = 1.0 - autoAnimation->current_frame * (1.0 / autoAnimation->frame_end);
+				}
+				if (entity->disappearAngle) {
+					DisappearAngleComponent* disappearAngle = (DisappearAngleComponent*)entity->disappearAngle;
+					if (entity->angle) {
+						RotateComponent* angle = (RotateComponent*)entity->angle;
+						angle->origin_x = disappearAngle->origin_x;
+						angle->origin_y = disappearAngle->origin_y;
+						if (sprite->flip_flag == SDL_FLIP_HORIZONTAL)
+							angle->angle = -autoAnimation->current_frame * (disappearAngle->end_angle / autoAnimation->frame_end);
+						else if (sprite->flip_flag == SDL_FLIP_NONE)
+							angle->angle = autoAnimation->current_frame * (disappearAngle->end_angle / autoAnimation->frame_end);
+					} else {
+						if (sprite->flip_flag == SDL_FLIP_HORIZONTAL)
+							entity->angle = new RotateComponent(-autoAnimation->current_frame * (disappearAngle->end_angle / autoAnimation->frame_end), disappearAngle->origin_x, disappearAngle->origin_y);
+						else if (sprite->flip_flag == SDL_FLIP_NONE)
+							entity->angle = new RotateComponent(autoAnimation->current_frame * (disappearAngle->end_angle / autoAnimation->frame_end), disappearAngle->origin_x, disappearAngle->origin_y);
+					}
+				}
+				renderSpriteSystem(entity, renderer, layer);
+				if (autoAnimation->current_frame < autoAnimation->frame_end)
+					autoAnimation->current_frame++;
+				else {
+					autoAnimation->current_frame = 0;
+					autoAnimation->is_started = false;
+				}
+			}
 		}
 	}
 }
@@ -100,7 +154,7 @@ void spawnerSystem(Entity* entity, Renderer* renderer, int layer) {
 	}
 }
 
-void timelineTickSystem(Entity* entity, Renderer* renderer, EventManager* eventManager) {
+void timelineTickSystem(Entity* entity, EventManager* eventManager) {
 	if (entity->shrinkable) {
 		ShrinkableComponent* shrinkable = (ShrinkableComponent*)entity->shrinkable;
 		if (shrinkable->started) {

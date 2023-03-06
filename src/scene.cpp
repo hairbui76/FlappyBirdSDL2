@@ -26,13 +26,15 @@ void SceneManager::Responder(Event* event) {
 			if (!strcmp(event->data, "GAME_SCENE")) {
 				ChangeScene(GAME);
 			}
-			if (!strcmp(event->data, "END_SCENE_LEFT")) {
+			if (!strcmp(event->data, "LEFT")) {
 				SDL_Delay(500);
-				ChangeScene(END, LEFT);
+				std::cout << event->score << std::endl;
+				ChangeScene(END, LEFT, event->score);
 			}
-			if (!strcmp(event->data, "END_SCENE_RIGHT")) {
+			if (!strcmp(event->data, "RIGHT")) {
 				SDL_Delay(500);
-				ChangeScene(END, RIGHT);
+				std::cout << event->score << std::endl;
+				ChangeScene(END, RIGHT, event->score);
 			}
 			break;
 		}
@@ -43,7 +45,7 @@ void SceneManager::Responder(Event* event) {
 	}
 }
 
-void SceneManager::ChangeScene(scene_e sceneTag, move_tag_e move_state) {
+void SceneManager::ChangeScene(scene_e sceneTag, move_tag_e move_state, int score) {
 	switch (sceneTag) {
 		case TITLE:
 			currentScene = new TitleScene(eventManager);
@@ -52,7 +54,7 @@ void SceneManager::ChangeScene(scene_e sceneTag, move_tag_e move_state) {
 			currentScene = new GameScene(eventManager);
 			break;
 		case END:
-			currentScene = new EndScene(eventManager, move_state);
+			currentScene = new EndScene(eventManager, move_state, score);
 			break;
 		default:
 			break;

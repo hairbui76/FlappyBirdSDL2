@@ -15,7 +15,7 @@ struct Scene {
 };
 
 class SceneManager : public EventListener {
-	void ChangeScene(scene_e sceneTag, move_tag_e move_state = NONE);
+	void ChangeScene(scene_e sceneTag, move_tag_e move_state = NONE, int score = 0);
 	Scene* currentScene;
 	Renderer* renderer;
 	EventManager* eventManager;

@@ -1,44 +1,22 @@
 #include "component.h"
 #include "entity.h"
 #include "renderer.h"
+#include "system.h"
 #include <iostream>
 
-PositionComponent::PositionComponent(double x, double y) {
-	this->tag = POSITION;
-	this->x = x;
-	this->y = y;
-}
+Component::Component(component_tag_e tag) : tag(tag) {}
 
-SpriteComponent::SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag) {
-	this->tag = SPRITE;
-	this->tName = tName;
-	this->scale = scale;
-	this->layer = layer;
-	this->flip_flag = flip_flag;
-}
+PositionComponent::PositionComponent(double x, double y) : Component(POSITION), x(x), y(y) {}
 
-RotateComponent::RotateComponent(double angle) {
-	this->tag = ANGLE;
-	this->angle = angle;
-}
+SpriteComponent::SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag, double alpha) : alpha(alpha), flip_flag(flip_flag), Component(SPRITE), tName(tName), scale(scale), layer(layer) {}
 
-ScoreComponent::ScoreComponent(int maxScore) {
-	this->tag = SCORE;
-	this->score = 0;
-	this->maxScore = maxScore;
-}
+RotateComponent::RotateComponent(double angle, float origin_x, float origin_y) : Component(ANGLE), angle(angle), origin_x(origin_x), origin_y(origin_y) {}
 
-SizeComponent::SizeComponent(double w, double h) {
-	this->tag = SIZE;
-	this->w = w;
-	this->h = h;
-}
+ScoreComponent::ScoreComponent(int maxScore) : Component(SCORE), maxScore(maxScore), score(0) {}
 
-ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr, EventManager* eventManager) {
-	this->tag = SCORELISTENER;
-	this->scr = scr;
-	this->eventManager = eventManager;
-}
+SizeComponent::SizeComponent(double w, double h) : Component(SIZE), w(w), h(h) {}
+
+ScoreListenerComponent::ScoreListenerComponent(ScoreComponent* scr, EventManager* eventManager) : Component(SCORELISTENER), scr(scr), eventManager(eventManager) {}
 
 void ScoreListenerComponent::Responder(Event* event) {
 	if (event->type == INC_SCORE) {
@@ -48,16 +26,9 @@ void ScoreListenerComponent::Responder(Event* event) {
 	}
 }
 
-ClickableComponent::ClickableComponent() {
-	this->tag = CLICKABLE;
-	this->isClicked = false;
-}
+ClickableComponent::ClickableComponent() : Component(CLICKABLE), isClicked(false) {}
 
-ClickListenerComponent::ClickListenerComponent(Entity* entity, EventManager* eventManager) {
-	this->tag = CLICKLISTENER;
-	this->entity = entity;
-	this->eventManager = eventManager;
-}
+ClickListenerComponent::ClickListenerComponent(Entity* entity, EventManager* eventManager) : Component(CLICKLISTENER), entity(entity), eventManager(eventManager) {}
 
 void ClickListenerComponent::Responder(Event* event) {
 	if (event->type == MOUSE_BUTT) {
@@ -73,15 +44,9 @@ void ClickListenerComponent::Responder(Event* event) {
 	}
 }
 
-MovableComponent::MovableComponent() {
-	this->tag = MOVABLE;
-	this->state = RIGHT;
-}
+MovableComponent::MovableComponent() : state(RIGHT), Component(MOVABLE) {}
 
-MoveListenerComponent::MoveListenerComponent(Entity* entity) {
-	this->tag = MOVELISTENER;
-	this->entity = entity;
-}
+MoveListenerComponent::MoveListenerComponent(Entity* entity) : entity(entity), Component(MOVELISTENER) {}
 
 void MoveListenerComponent::Responder(Event* event) {
 	if (event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) {
@@ -96,14 +61,9 @@ void MoveListenerComponent::Responder(Event* event) {
 	}
 }
 
-SpawnerComponent::SpawnerComponent() {
-	this->tag = SPAWNER;
-}
+SpawnerComponent::SpawnerComponent() : Component(SPAWNER) {}
 
-SpawnerListenerComponent::SpawnerListenerComponent(Entity* entity) {
-	this->tag = SPAWNERLISTENER;
-	this->entity = entity;
-}
+SpawnerListenerComponent::SpawnerListenerComponent(Entity* entity) : entity(entity), Component(SPAWNERLISTENER) {}
 
 void SpawnerListenerComponent::Responder(Event* event) {
 	if (event->type == SPAWN_BRANCH) {
@@ -157,23 +117,11 @@ void SpawnerListenerComponent::Responder(Event* event) {
 	}
 }
 
-CuttableComponent::CuttableComponent(int origin_x, int origin_y, int cut_width, int cut_height) {
-	this->tag = CUTTABLE;
-	this->origin_x = origin_x;
-	this->origin_y = origin_y;
-	this->cut_width = cut_width;
-	this->cut_height = cut_height;
-};
+CuttableComponent::CuttableComponent(int origin_x, int origin_y, int cut_width, int cut_height) : origin_x(origin_x), origin_y(origin_y), cut_width(cut_width), cut_height(cut_height), Component(CUTTABLE) {}
 
-HandAnimationComponent::HandAnimationComponent() {
-	this->tag = HANDANIMATION;
-	this->current_frame = 0;
-}
+HandAnimationComponent::HandAnimationComponent() : current_frame(0), Component(HANDANIMATION) {}
 
-HandAnimationListenerComponent::HandAnimationListenerComponent(Entity* entity) {
-	this->tag = HANDANIMATIONLISTENER;
-	this->entity = entity;
-}
+HandAnimationListenerComponent::HandAnimationListenerComponent(Entity* entity) : entity(entity), Component(HANDANIMATIONLISTENER) {}
 
 void HandAnimationListenerComponent::Responder(Event* event) {
 	if ((event->type == KEYDOWN && (!strcmp(event->data, "LEFT") || !strcmp(event->data, "RIGHT"))) || event->type == GAME_OVER) {
@@ -219,22 +167,11 @@ void HandAnimationListenerComponent::Responder(Event* event) {
 	}
 }
 
-DeadComponent::DeadComponent() {
-	this->tag = DEAD;
-	this->is_dead = false;
-	this->is_over = false;
-}
+DeadComponent::DeadComponent() : is_dead(false), is_over(false), Component(DEAD) {}
 
-ShrinkableComponent::ShrinkableComponent() {
-	this->tag = SHRINKABLE;
-	this->value = 1;
-	this->started = false;
-}
+ShrinkableComponent::ShrinkableComponent() : value(1), started(false), Component(SHRINKABLE) {}
 
-ShrinkListenerComponent::ShrinkListenerComponent(ShrinkableComponent* shrinkable) {
-	this->tag = SHRINKLISTENER;
-	this->shrinkable = shrinkable;
-}
+ShrinkListenerComponent::ShrinkListenerComponent(ShrinkableComponent* shrinkable) : shrinkable(shrinkable), Component(SHRINKLISTENER) {}
 
 void ShrinkListenerComponent::Responder(Event* event) {
 	if (event->type == LEVEL_UP) {
@@ -247,7 +184,52 @@ void ShrinkListenerComponent::Responder(Event* event) {
 	}
 };
 
-AutoAnimationComponent::AutoAnimationComponent(Entity* entity) {
-	this->tag = AUTOANIMATION;
-	this->entity = entity;
+AutoAnimationComponent::AutoAnimationComponent(int frame_end) : frame_end(frame_end), current_frame(0), is_started(false), Component(AUTOANIMATION) {}
+
+AutoAnimationListenerComponent::AutoAnimationListenerComponent(Entity* entity) : entity(entity), Component(AUTOANIMATIONLISTENER) {}
+
+void AutoAnimationListenerComponent::Responder(Event* event) {
+	if (event->type == CUT_TREE) {
+		AutoAnimationComponent* autoAnimation = (AutoAnimationComponent*)entity->autoAnimation;
+		autoAnimation->is_started = true;
+		DisappearAngleComponent* disappearAngle = (DisappearAngleComponent*)entity->disappearAngle;
+		if (!strcmp(event->data, "RIGHT")) {
+			disappearAngle->origin_x = 0;
+			disappearAngle->origin_y = 80;
+		} else if (!strcmp(event->data, "LEFT")) {
+			disappearAngle->origin_x = 125;
+			disappearAngle->origin_y = 80;
+		}
+		if (!entity->sprite) {
+			entity->size = new SizeComponent(125, 80);
+			if (!strcmp(event->data, "LEFT")) {
+				entity->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 3, SDL_FLIP_HORIZONTAL, 1.0);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 - 120, WIN_Y - 350);
+			} else if (!strcmp(event->data, "RIGHT")) {
+				entity->sprite = new SpriteComponent(TEX_BRANCH, 1.0, 3, SDL_FLIP_NONE, 1.0);
+				entity->position = new PositionComponent((WIN_X - 50) / 2 + 50, WIN_Y - 350);
+			}
+		} else {
+			SpriteComponent* sprite = (SpriteComponent*)entity->sprite;
+			if (!strcmp(event->data, "LEFT")) {
+				sprite->flip_flag = SDL_FLIP_HORIZONTAL;
+				if (entity->position) {
+					PositionComponent* position = (PositionComponent*)entity->position;
+					position->x = (WIN_X - 50) / 2 - 120;
+					position->y = WIN_Y - 350;
+				}
+			} else if (!strcmp(event->data, "RIGHT")) {
+				sprite->flip_flag = SDL_FLIP_NONE;
+				if (entity->position) {
+					PositionComponent* position = (PositionComponent*)entity->position;
+					position->x = (WIN_X - 50) / 2 + 50;
+					position->y = WIN_Y - 350;
+				}
+			}
+		}
+	}
 }
+
+DisappearComponent::DisappearComponent() : Component(DISAPPEAR) {}
+
+DisappearAngleComponent::DisappearAngleComponent(double end_angle) : end_angle(end_angle), Component(DISAPPEARANGLE) {}

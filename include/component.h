@@ -6,6 +6,7 @@ struct Entity;
 
 struct Component {
 	Component() = default;
+	Component(component_tag_e tag);
 	~Component() = default;
 
 	component_tag_e tag;
@@ -19,18 +20,21 @@ struct PositionComponent : Component {
 };
 
 struct SpriteComponent : Component {
-	SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag = SDL_FLIP_NONE);
+	SpriteComponent(texture_e tName, double scale, int layer, SDL_RendererFlip flip_flag = SDL_FLIP_NONE, double alpha = 1.0);
 
 	texture_e tName;
+	double alpha;
 	double scale;
 	int layer;
 	SDL_RendererFlip flip_flag;
 };
 
 struct RotateComponent : Component {
-	RotateComponent(double angle);
+	RotateComponent(double angle, float origin_x, float origin_y);
 
 	double angle;
+	float origin_x;
+	float origin_y;
 };
 
 struct SizeComponent : Component {
@@ -137,7 +141,28 @@ struct ShrinkListenerComponent : Component, EventListener {
 };
 
 struct AutoAnimationComponent : Component {
-	AutoAnimationComponent(Entity* entity);
+	AutoAnimationComponent(int frame_end);
 
+	int current_frame;
+	int frame_end;
+	bool is_started;
+};
+
+struct AutoAnimationListenerComponent : Component, EventListener {
+	AutoAnimationListenerComponent(Entity* entity);
+
+	void Responder(Event* event);
 	Entity* entity = nullptr;
+};
+
+struct DisappearComponent : Component {
+	DisappearComponent();
+};
+
+struct DisappearAngleComponent : Component {
+	DisappearAngleComponent(double end_angle);
+
+	float origin_x;
+	float origin_y;
+	double end_angle;
 };

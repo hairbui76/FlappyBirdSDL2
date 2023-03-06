@@ -1,8 +1,12 @@
 #include "renderer.h"
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <iostream>
+
+static Mix_Music* hit_sound;
+static Mix_Music* die_sound;
 
 static Texture* tex_bg;
 static Texture* tex_branch;
@@ -24,16 +28,16 @@ static Texture* tex_timeline_bar;
 static Texture* tex_timeline_warn;
 
 static Texture* tex_text_title;
+static Texture* tex_text_end;
 
 static TTF_Font* font;
 static TTF_Font* title_font;
 
-static SDL_Color red{155, 50, 50, 255};
 static SDL_Color white{255, 255, 255, 255};
 static SDL_Color grey{77, 77, 77, 255};
-static SDL_Color yellow{255, 0, 211, 255};
 
 static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mode = false, const char* text = "");
+// static Texture* LoadPngTex(SDL_Renderer* renderer, char const* fPath);
 
 Texture::Texture(SDL_Texture* tex, int w, int h) {
 	this->tex = tex;
@@ -46,6 +50,18 @@ Renderer::Renderer() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) logSDLError("Unable to initialize SDL: %s", SDL_GetError());
 	// init sdl ttf
 	if (TTF_Init() != 0) logSDLError("Unable to initialize SDL_ttf: %s", TTF_GetError());
+	// init sdl image
+	int mixer_flags = IMG_INIT_JPG | IMG_INIT_PNG;
+	if (IMG_Init(mixer_flags) != mixer_flags) logSDLError("Unable to initialize SDL_image: %s", IMG_GetError());
+	// init sdl mixer
+	int image_flags = MIX_INIT_MP3;
+	if (Mix_Init(image_flags) != image_flags) logSDLError("Unable to initialize SDL_mixer: %s", Mix_GetError());
+	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
+	// load sound;
+	hit_sound = Mix_LoadMUS("assets/hit.mp3");
+	if (!hit_sound) logSDLError("Unable to load hit_sound: %s", Mix_GetError());
+	die_sound = Mix_LoadMUS("assets/die.mp3");
+	if (!die_sound) logSDLError("Unable to load die_sound: %s", Mix_GetError());
 	// create window
 	window = SDL_CreateWindow("Branch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_X, WIN_Y, SDL_WINDOW_RESIZABLE);
 	if (!window) logSDLError("Unable to create window: %s", SDL_GetError());
@@ -98,6 +114,9 @@ Renderer::Renderer() {
 	// title text
 	tex_text_title = LoadTex(renderer, " ", true, "Lumberjack");
 	if (!tex_text_title) logSDLError("Unable to load tex_text_title: %s", TTF_GetError());
+	// end text
+	tex_text_end = LoadTex(renderer, " ", true, "You score");
+	if (!tex_text_end) logSDLError("Unable to load tex_text_title: %s", TTF_GetError());
 }
 
 Renderer::~Renderer() {
@@ -120,15 +139,19 @@ Renderer::~Renderer() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	TTF_CloseFont(font);
+	Mix_FreeMusic(die_sound);
+	Mix_FreeMusic(hit_sound);
 	TTF_Quit();
 	SDL_Quit();
 }
 
-void Renderer::renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, Texture* tex, texture_e tag, bool full, SDL_RendererFlip flip_flag) {
+void Renderer::renderSprite(SDL_Rect sRect, SDL_FRect dRect, double angle, SDL_FPoint* center, double alpha, Texture* tex, texture_e tag, bool full, SDL_RendererFlip flip_flag) {
+	if (SDL_SetTextureAlphaMod(tex->tex, alpha * 255) != 0) logSDLError("Unable to set texture alpha: %s", SDL_GetError());
+	// std::cout << center->x << " " << center->y << std::endl;
 	if (full) {
-		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, NULL, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
+		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, NULL, angle, center, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
 	} else {
-		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, &dRect, angle, NULL, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
+		if (SDL_RenderCopyExF(renderer, tex->tex, &sRect, &dRect, angle, center, flip_flag) != 0) logSDLError("Unable to render %s texture: %s", getTextureTag(tag).c_str(), SDL_GetError());
 	}
 }
 
@@ -216,6 +239,9 @@ Texture* Renderer::GetTexture(texture_e tag) {
 		case TEX_TEXT_TITLE:
 			return tex_text_title;
 
+		case TEX_TEXT_END:
+			return tex_text_end;
+
 		default:
 			return nullptr;
 	}
@@ -238,4 +264,33 @@ static Texture* LoadTex(SDL_Renderer* renderer, char const* fPath, bool text_mod
 	Texture* tex = new Texture(new_tex, w, h);
 
 	return tex;
+}
+
+// static Texture* LoadPngTex(SDL_Renderer* renderer, char const* fPath) {
+// 	SDL_Surface* surf = IMG_Load(fPath);
+// 	if (!surf) return nullptr;
+// 	Uint32 colorkey = SDL_MapRGB(surf->format, 0, 0, 0);
+// 	SDL_SetColorKey(surf, SDL_TRUE, colorkey);
+// 	SDL_Texture* new_tex = SDL_CreateTextureFromSurface(renderer, surf);
+// 	SDL_FreeSurface(surf);
+// 	int w, h;
+// 	SDL_QueryTexture(new_tex, NULL, NULL, &w, &h);
+// 	Texture* tex = new Texture(new_tex, w, h);
+
+// 	return tex;
+// }
+
+void Renderer::PlaySound(sound_e sName) {
+	switch (sName) {
+		case HIT:
+			Mix_PlayMusic(hit_sound, 1);
+			break;
+
+		case DIE:
+			Mix_PlayMusic(die_sound, 1);
+			break;
+
+		default:
+			break;
+	}
 }

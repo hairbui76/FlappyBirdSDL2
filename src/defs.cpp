@@ -47,6 +47,8 @@ std::string getTextureTag(texture_e tag) {
 			return "TEX_LUMBER_CUTTING";
 		case TEX_TEXT_TITLE:
 			return "TEX_TEXT_TITLE";
+		case TEX_TEXT_END:
+			return "TEX_TEXT_END";
 		default:
 			return "";
 	}

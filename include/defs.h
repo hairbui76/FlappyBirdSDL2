@@ -38,7 +38,10 @@ enum component_tag_e {
 	DEADLISTENER,
 	SHRINKABLE,
 	SHRINKLISTENER,
-	AUTOANIMATION
+	AUTOANIMATION,
+	AUTOANIMATIONLISTENER,
+	DISAPPEAR,
+	DISAPPEARANGLE
 };
 
 enum texture_e {
@@ -57,7 +60,8 @@ enum texture_e {
 	TEX_TIMELINE,
 	TEX_TIMELINE_BAR,
 	TEX_TIMELINE_WARN,
-	TEX_TEXT_TITLE
+	TEX_TEXT_TITLE,
+	TEX_TEXT_END
 };
 
 enum scene_e {
@@ -77,7 +81,14 @@ enum event_type_e {
 	MOUSE_BUTT,
 	SPAWN_BRANCH,
 	LEVEL_UP,
-	BUTT_CLICK
+	BUTT_CLICK,
+	CUT_TREE,
+	CUT_WOOD
+};
+
+enum sound_e {
+	HIT,
+	DIE
 };
 
 int getRandom(int a, int b);

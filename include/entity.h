@@ -24,6 +24,9 @@ struct Entity {
 	Component* shrinkable;
 	Component* shrinkListener;
 	Component* autoAnimation;
+	Component* autoAnimationListener;
+	Component* disappear;
+	Component* disappearAngle;
 
 	Entity();
 	~Entity();

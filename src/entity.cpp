@@ -23,6 +23,8 @@ Entity::Entity() {
 	this->shrinkable = nullptr;
 	this->shrinkListener = nullptr;
 	this->autoAnimation = nullptr;
+	this->autoAnimationListener = nullptr;
+	this->disappear = nullptr;
 }
 
 Entity::~Entity() {
@@ -46,6 +48,8 @@ Entity::~Entity() {
 	delete shrinkable;
 	delete shrinkListener;
 	delete autoAnimation;
+	delete autoAnimationListener;
+	delete disappear;
 }
 
 EntityManager::~EntityManager() {
